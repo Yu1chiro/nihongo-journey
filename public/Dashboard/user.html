@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - Nihongo Journey</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-auth-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-database-compat.min.js"></script>
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              "japanese-red": "#C5282F",
+              "japanese-blue": "#1E3A8A",
+              sakura: "#FFB7C5",
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="bg-gray-50 min-h-screen">
+    <div class="bg-white shadow-sm border-b sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center py-4">
+          <!-- Logo/Brand -->
+          <h1 class="text-lg font-bold text-gray-900">Dashboard</h1>
+
+          <!-- Desktop Navigation -->
+          <nav class="hidden md:flex items-center space-x-8">
+            <a href="/Dashboard/user" class="text-gray-600 hover:text-gray-900 transition-colors">Dashboard</a>
+            <a href="/Dashboard/roadmap" class="text-gray-600 hover:text-gray-900 transition-colors">Roadmap</a>
+            <a href="/Dashboard/flashcards" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Flashcards</a>
+            <a href="/Dashboard/kanji" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Kanji</a>
+          </nav>
+
+          <!-- Mobile Menu Button -->
+          <div class="md:hidden flex items-center">
+            <div id="userInfoMobile" class="hidden flex items-center mr-4">
+              <span id="userNameMobile" class="text-sm text-gray-600 truncate max-w-xs"></span>
+            </div>
+            <button id="mobile-menu-button" class="text-gray-500 hover:text-gray-900 focus:outline-none">
+              <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Menu (Hidden by default) -->
+      <div id="mobile-menu" class="fixed inset-0 z-40 hidden">
+        <!-- Overlay -->
+        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" id="mobile-menu-overlay"></div>
+
+        <!-- Menu Container (Slides from right) -->
+        <div class="fixed inset-y-0 right-0 max-w-xs w-full bg-white shadow-xl transform transition-transform duration-300 ease-in-out translate-x-full">
+          <div class="flex flex-col h-full">
+            <!-- Menu Header -->
+            <div class="flex justify-between items-center px-4 py-4 border-b">
+              <img id="userPhoto" class="w-8 h-8 rounded-full" alt="User Photo" />
+              <h2 id="userName" class="flex text-gray-700"></h2>
+              <button id="mobile-menu-close" class="text-gray-500 hover:text-gray-900">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <!-- Menu Items -->
+            <div class="flex-1 overflow-y-auto px-4 py-6 space-y-4">
+              <a href="/Dashboard/user" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
+              <a href="/Dashboard/roadmap" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Roadmap</a>
+              <a href="/Dashboard/flashcards" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Flashcards</a>
+              <a href="/Dashboard/kanji" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Kanji</a>
+
+              <button id="signOutBtn" class="block text-red-600 hover:text-red-900 px-3 py-2 rounded-md text-base font-medium transition-colors duration-200">Signout</button>
+            </div>
+
+            <!-- Footer with Sign Out -->
+            <div class="px-4 py-4 border-t"></div>
+          </div>
+        </div>
+      </div>
+      <!-- script -->
+      <script>
+        // Mobile menu functionality
+        const mobileMenuButton = document.getElementById("mobile-menu-button");
+        const mobileMenuClose = document.getElementById("mobile-menu-close");
+        const mobileMenu = document.getElementById("mobile-menu");
+        const mobileMenuOverlay = document.getElementById("mobile-menu-overlay");
+        const mobileMenuContainer = mobileMenu.querySelector(".max-w-xs");
+
+        function openMobileMenu() {
+          mobileMenu.classList.remove("hidden");
+          setTimeout(() => {
+            mobileMenuOverlay.classList.remove("opacity-0");
+            mobileMenuContainer.classList.remove("translate-x-full");
+          }, 20);
+        }
+
+        function closeMobileMenu() {
+          mobileMenuOverlay.classList.add("opacity-0");
+          mobileMenuContainer.classList.add("translate-x-full");
+          setTimeout(() => {
+            mobileMenu.classList.add("hidden");
+          }, 300);
+        }
+
+        mobileMenuButton.addEventListener("click", openMobileMenu);
+        mobileMenuClose.addEventListener("click", closeMobileMenu);
+        mobileMenuOverlay.addEventListener("click", closeMobileMenu);
+
+        // Close menu when clicking outside
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && !mobileMenu.classList.contains("hidden")) {
+            closeMobileMenu();
+          }
+        });
+      </script>
+    </div>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- Welcome Section -->
+      <div class="bg-gradient-to-r from-japanese-blue to-japanese-red rounded-lg p-6 text-white mb-8">
+        <h1 class="text-lg font-bold mb-2">こんにちは！ <span id="displayName" class="text-lg font-bold"></span></h1>
+        <p class="text-blue-100">Mari lanjutkan perjalanan belajar bahasa Jepang Anda hari ini.</p>
+      </div>
+
+      <!-- Loading State -->
+      <div id="loading" class="text-center py-8">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-japanese-red mx-auto"></div>
+        <p class="mt-4 text-gray-600">Memuat statistik...</p>
+      </div>
+
+      <!-- Statistics Grid -->
+      <div id="statsContainer" class="hidden">
+        <!-- Progress Overview -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div class="bg-white rounded-lg p-6 shadow-md">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-sm font-medium text-gray-500">Total Pelajaran</h3>
+                <p class="text-lg font-bold text-gray-900">5</p>
+                <p id="completedLessons" class="text-lg text-gray-700 hidden"></p>
+              </div>
+              <div class="bg-blue-100 rounded-full p-3">
+                <span class="text-2xl">📚</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg p-6 shadow-md">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-sm font-medium text-gray-500">Level Saat Ini</h3>
+                <p id="currentLevel" class="text-lg font-bold text-purple-600">-</p>
+              </div>
+              <div class="bg-purple-100 rounded-full p-3">
+                <span class="text-2xl">🎯</span>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg p-6 shadow-md">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-sm font-medium text-gray-500">Date</h3>
+                <p id="Daysistem" class="text-lg font-bold text-purple-600">-</p>
+              </div>
+              <div class="bg-purple-100 rounded-full p-3">
+                <span class="text-2xl">📅</span>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg p-6 shadow-md">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-sm font-medium text-gray-500">Time</h3>
+                <p id="Date-time" class="text-lg font-bold text-purple-600">-</p>
+              </div>
+              <div class="bg-purple-100 rounded-full p-3">
+                <span class="text-2xl">🕒</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Progress Details -->
+        <div class="grid md:grid-cols-2 gap-6 mb-8">
+          <!-- Study Progress -->
+          <div class="bg-white rounded-lg p-6 shadow-md">
+            <h3 class="text-lg font-semibold mb-4">Progress Belajar</h3>
+            <div class="space-y-2">
+              <div>
+                <div class="flex justify-between text-sm text-gray-600 mb-1">
+                  <span>Roadmap</span>
+                  <span id="completionPercentage">-</span>
+                </div>
+                <div class="w-full bg-gray-200 mb-2 rounded-full h-2">
+                  <div id="completionBar" class="bg-green-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+                <!--  -->
+                <div class="flex justify-between text-sm text-gray-600 mb-1">
+                  <span>Kanji</span>
+                  <span id="kanjiPercentage">-</span>
+                </div>
+                <div class="w-full bg-gray-200 mb-2 rounded-full h-2">
+                  <div id="kanjiBar" class="bg-green-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+                <!--  -->
+                <div class="flex justify-between text-sm text-gray-600 mb-1">
+                  <span>Hiragana & Katakana</span>
+                  <span id="hirakanaPercentage">-</span>
+                </div>
+                <div class="w-full bg-gray-200 mb-2 rounded-full h-2">
+                  <div id="hirakanaBar" class="bg-green-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+              </div>
+
+              <div class="pt-4 border-t">
+                <div class="flex justify-between items-center">
+                  <span class="text-sm text-gray-600">Waktu Belajar Total</span>
+                  <span id="totalStudyTime" class="font-semibold">-</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Vocabulary & Kanji -->
+          <div class="bg-white rounded-lg p-6 shadow-md">
+            <h3 class="text-lg font-semibold mb-4">Learn by Lessons</h3>
+            <div class="space-y-4">
+              <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                <div class="flex items-center space-x-3">
+                  <span class="text-2xl">言葉</span>
+                  <div>
+                    <p class="font-medium">Kosakata Dipelajari</p>
+                    <p class="text-sm text-gray-600">Total kosakata yang dikuasai</p>
+                  </div>
+                </div>
+                <span id="vocabularyLearned" class="text-2xl font-bold text-blue-600">-</span>
+              </div>
+
+              <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                <div class="flex items-center space-x-3">
+                  <span class="text-2xl">漢字</span>
+                  <div>
+                    <p class="font-medium">Kanji</p>
+                    <p class="text-sm text-gray-600">Total karakter Kanji yang dikuasai</p>
+                  </div>
+                </div>
+                <span id="kanjiLearned" class="text-2xl font-bold text-japanese-red">-</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="bg-white rounded-lg p-6 shadow-md">
+          <h3 class="text-lg font-semibold mb-4">Aksi Cepat</h3>
+          <div class="grid md:grid-cols-3 gap-4">
+            <a href="/Dashboard/roadmap" class="bg-japanese-blue text-white p-4 rounded-lg hover:bg-blue-800 transition-colors duration-200 text-center">
+              <div class="text-2xl mb-2">📖</div>
+              <div class="font-medium">Mulai Pelajaran</div>
+              <div class="text-sm opacity-90">Lanjutkan belajar</div>
+            </a>
+
+            <a href="/Dashboard/flashcards" class="bg-green-600 text-white p-4 rounded-lg hover:bg-green-700 transition-colors duration-200 text-center">
+              <div class="text-2xl mb-2">🧠</div>
+              <div class="font-medium">Latihan Hiragana & Katakana</div>
+              <div class="text-sm opacity-90">Tingkatkan Pemahamanmu pada huruf jepang</div>
+            </a>
+
+            <a href="/Dashboard/kanji" class="bg-purple-600 text-white p-4 rounded-lg hover:bg-purple-700 transition-colors duration-200 text-center">
+              <div class="text-2xl mb-2">✍️</div>
+              <div class="font-medium">Latihan Kanji Dasar</div>
+              <div class="text-sm opacity-90">Tulis karakter</div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+  <script src="/Dashboard/JS/main.js"></script>
+  <script src="/Dashboard/JS/progress.js"></script>
+</html>

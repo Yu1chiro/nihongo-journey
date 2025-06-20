@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Nihongo Journey - Belajar bahasa Jepang dengan mudah dan menyenangkan. Mulai petualanganmu hari ini!" />
+    <meta name="keywords" content="belajar bahasa Jepang, Nihongo Journey, kursus Jepang, hiragana, katakana, kanji, JLPT" />
+    <meta name="author" content="Nihongo Journey" />
+    <!-- Open Graph (Facebook, Discord, Line, WhatsApp, LinkedIn) -->
+    <meta property="og:title" content="Nihongo Journey" />
+    <meta property="og:description" content="Petualangan menyenangkan belajar bahasa Jepang untuk pemula hingga mahir." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://nihongo-journey.vercel.app" />
+    <meta property="og:image" content="https://nihongo-journey.vercel.app/icon.png" />
+    <!-- Gambar thumbnail -->
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Nihongo Journey" />
+    <meta name="twitter:description" content="Petualangan menyenangkan belajar bahasa Jepang untuk pemula hingga mahir." />
+    <meta name="twitter:image" content="https://nihongo-journey.vercel.app/icon.png" />
+    <title>Nihongo Journey | Yuichiro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="shortcut icon" href="icon.png" type="image/x-icon" />
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <link rel="stylesheet" href="index.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#8ECAE6",
+              secondary: "#219EBC",
+              accent: "#023047",
+              light: "#F8F9FA",
+              paper: "#F5F5F5",
+              natural: "#E9EDC9",
+            },
+            fontFamily: {
+              sans: ['"Noto Sans JP"', "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="bg-light text-accent">
+    <!-- Navbar -->
+    <nav class="bg-white py-4 shadow-sm wabi-border">
+      <div class="container mx-auto px-4 flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+          <i class="fas fa-language text-2xl text-secondary"></i>
+          <span class="text-xl font-medium">Nihongo Journey</span>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-pattern py-16 md:py-24">
+      <div class="container mx-auto px-4 flex flex-col md:flex-row items-center">
+        <div class="md:w-1/2 mb-12 md:mb-0">
+          <h1 class="text-3xl md:text-4xl font-medium mb-6 leading-tight">Belajar Bahasa Jepang dengan <span class="text-secondary">Ketenangan</span> dan <span class="text-secondary">Kesederhanaan</span></h1>
+          <p class="text-lg text-gray-600 mb-8">Metode otodidak yang mengutamakan proses alami belajar bahasa. Fokus pada Hiragana & Romaji dengan pendekatan yang tenang dan berkelanjutan.</p>
+          <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
+            <a href="#features" class="bg-secondary hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium text-center transition duration-300 shadow-sm"> Lihat Fitur </a>
+            <a href="#signInBtn" class="bg-green-500 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium text-center transition duration-300 shadow-sm"> Mulai Belajar </a>
+          </div>
+        </div>
+        <div class="md:w-1/2 flex justify-center">
+          <div class="wabi-border p-2 bg-white shadow-sm">
+            <img src="icon.png" alt="Belajar dengan Tenang" class="w-full max-w-md" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-16 bg-white">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+          <h2 class="text-2xl font-medium mb-3">Fitur yang Menenangkan</h2>
+          <div class="w-20 h-1 bg-secondary mx-auto mb-6"></div>
+          <p class="text-gray-600 max-w-2xl mx-auto">Setiap fitur dirancang untuk mengurangi kecemasan dan meningkatkan fokus pada pembelajaran.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          <!-- Feature 1 -->
+          <div class="feature-card p-6 rounded-lg">
+            <div class="w-10 h-10 bg-primary bg-opacity-20 rounded-full flex items-center justify-center mb-4">
+              <i class="fas fa-layer-group text-secondary text-lg"></i>
+            </div>
+            <h3 class="text-lg font-medium mb-3">Modul Terstruktur</h3>
+            <p class="text-gray-600 text-sm">Pembelajaran bertahap yang mengalir seperti sungai. Setiap modul saling terhubung dengan alami.</p>
+          </div>
+
+          <!-- Feature 2 -->
+          <div class="feature-card p-6 rounded-lg">
+            <div class="w-10 h-10 bg-primary bg-opacity-20 rounded-full flex items-center justify-center mb-4">
+              <i class="fas fa-robot text-secondary text-lg"></i>
+            </div>
+            <h3 class="text-lg font-medium mb-3">Materi by Gemini</h3>
+            <p class="text-gray-600 text-sm">Konten yang beradaptasi dengan ritme belajar Anda, seperti teh yang diseduh sesuai suhu yang tepat.</p>
+          </div>
+
+          <!-- Feature 3 -->
+          <div class="feature-card p-6 rounded-lg">
+            <div class="w-10 h-10 bg-primary bg-opacity-20 rounded-full flex items-center justify-center mb-4">
+              <i class="fas fa-mobile-alt text-secondary text-lg"></i>
+            </div>
+            <h3 class="text-lg font-medium mb-3">Mobile Friendly</h3>
+            <p class="text-gray-600 text-sm">Belajar di mana saja, kapan saja. Seperti taman zen yang selalu bisa Anda kunjungi.</p>
+          </div>
+
+          <!-- Feature 4 -->
+          <div class="feature-card p-6 rounded-lg">
+            <div class="w-10 h-10 bg-primary bg-opacity-20 rounded-full flex items-center justify-center mb-4">
+              <i class="fas fa-chart-line text-secondary text-lg"></i>
+            </div>
+            <h3 class="text-lg font-medium mb-3">Progress Tracking</h3>
+            <p class="text-gray-600 text-sm">Pantau perkembangan tanpa tekanan. Seperti melihat pohon tumbuh perlahan.</p>
+          </div>
+
+          <!-- Feature 5 -->
+          <div class="feature-card p-6 rounded-lg">
+            <div class="w-10 h-10 bg-primary bg-opacity-20 rounded-full flex items-center justify-center mb-4">
+              <i class="fas fa-question-circle text-secondary text-lg"></i>
+            </div>
+            <h3 class="text-lg font-medium mb-3">Quiz Interaktif</h3>
+            <p class="text-gray-600 text-sm">Latihan yang menyenangkan, seperti permainan tradisional Jepang.</p>
+          </div>
+
+          <!-- Feature 6 -->
+          <div class="feature-card p-6 rounded-lg">
+            <div class="w-10 h-10 bg-primary bg-opacity-20 rounded-full flex items-center justify-center mb-4">
+              <i class="fas fa-font text-secondary text-lg"></i>
+            </div>
+            <h3 class="text-lg font-medium mb-3">Hiragana & Romaji Only</h3>
+            <p class="text-gray-600 text-sm">Fokus pada dasar-dasar yang indah, sebelum melangkah lebih jauh.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-16 natural-bg">
+      <div class="container mx-auto px-4 text-center">
+        <div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-sm wabi-border">
+          <h2 class="text-2xl font-medium mb-4">Siap Memulai Perjalanan Bahasa Jepang Anda?</h2>
+          <p class="text-gray-600 mb-6">Bergabunglah dengan komunitas pembelajar yang menghargai proses dan perkembangan alami.</p>
+
+          <button id="signInBtn" class="bg-white border border-gray-300 rounded-lg px-6 py-3 text-gray-700 font-medium hover:bg-gray-50 transition-colors duration-200 shadow-md hover:shadow-lg flex items-center mx-auto">
+            <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+            </svg>
+            Masuk dengan Google
+          </button>
+
+          <p class="mt-4 text-gray-500 text-sm">Tidak memerlukan informasi kartu kredit. Mulai belajar dalam hitungan detik.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-8 bg-accent text-white">
+      <div class="container mx-auto px-4 text-center">
+        <div class="flex justify-center space-x-6 mb-6">
+          <a href="#" class="hover:text-primary transition duration-300">
+            <i class="fab fa-twitter"></i>
+          </a>
+          <a href="#" class="hover:text-primary transition duration-300">
+            <i class="fab fa-instagram"></i>
+          </a>
+          <a href="#" class="hover:text-primary transition duration-300">
+            <i class="fab fa-youtube"></i>
+          </a>
+        </div>
+        <p class="text-gray-300 text-sm">&copy; Nihonggo Journey <span id="currentYear"></span>. Semua hak dilindungi.</p>
+      </div>
+    </footer>
+    <!-- Firebase Configuration -->
+    <script>
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyDpyrC1-1xl6pyCLKBd4mZbW93K1F95FJs",
+        authDomain: "nihongo-journey.firebaseapp.com",
+        projectId: "nihongo-journey",
+        storageBucket: "nihongo-journey.firebasestorage.app",
+        messagingSenderId: "966989016758",
+        appId: "1:966989016758:web:25d43be34bbc1a1342c017",
+        measurementId: "G-2J392RPFMR",
+      };
+
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+      const provider = new firebase.auth.GoogleAuthProvider();
+
+      // Add additional scopes for better user info
+      provider.addScope("profile");
+      provider.addScope("email");
+
+      // Sign in with Google
+      document.getElementById("signInBtn").addEventListener("click", async () => {
+        try {
+          console.log("Starting Google sign in...");
+          const result = await auth.signInWithPopup(provider);
+          const user = result.user;
+
+          console.log("Google sign in successful, getting ID token...");
+          const idToken = await user.getIdToken();
+
+          console.log("Sending token to backend...");
+          // Send token to backend
+          const response = await fetch("/api/auth/signin", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ idToken }),
+          });
+
+          const responseData = await response.json();
+          console.log("Backend response:", responseData);
+
+          if (response.ok && responseData.success) {
+            console.log("Authentication successful, redirecting...");
+            // Redirect to dashboard
+            window.location.href = "/Dashboard/user";
+          } else {
+            console.error("Authentication failed:", responseData);
+            alert("Login gagal: " + (responseData.error || "Unknown error"));
+          }
+        } catch (error) {
+          console.error("Error during sign in:", error);
+          alert("Terjadi kesalahan saat login: " + error.message);
+        }
+      });
+
+      // Check if user is already signed in
+      auth.onAuthStateChanged(async (user) => {
+        if (user) {
+          try {
+            console.log("User already signed in, verifying session...");
+
+            // Check if we already have a valid session cookie
+            const sessionCheck = await fetch("/api/user/profile");
+
+            if (sessionCheck.ok) {
+              console.log("Valid session found, redirecting...");
+              // Already authenticated with valid session
+              window.location.href = "/Dashboard/user";
+              return;
+            }
+
+            // No valid session, create new one
+            console.log("No valid session, creating new session...");
+            const idToken = await user.getIdToken();
+            const response = await fetch("/api/auth/signin", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ idToken }),
+            });
+
+            const responseData = await response.json();
+
+            if (response.ok && responseData.success) {
+              console.log("Session created, redirecting...");
+              window.location.href = "/Dashboard/user";
+            } else {
+              console.log("Session creation failed:", responseData);
+            }
+          } catch (error) {
+            console.error("Auto sign-in failed:", error);
+          }
+        } else {
+          console.log("No user signed in");
+        }
+      });
+    </script>
+  </body>
+</html>

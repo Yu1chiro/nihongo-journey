@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Roadmap Pembelajaran Bahasa Jepang</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-auth-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-database-compat.min.js"></script>
+  </head>
+  <body class="bg-gradient-to-br from-purple-50 to-pink-50 min-h-screen">
+    <div class="bg-white shadow-sm border-b sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center py-4">
+          <!-- Logo/Brand -->
+          <h1 class="text-lg font-bold text-gray-900">Roadmap</h1>
+
+          <!-- Desktop Navigation -->
+          <nav class="hidden md:flex items-center space-x-8">
+            <a href="/Dashboard/user" class="text-gray-600 hover:text-gray-900 transition-colors">Dashboard</a>
+            <a href="/Dashboard/roadmap" class="text-gray-600 hover:text-gray-900 transition-colors">Roadmap</a>
+            <a href="/Dashboard/flashcards" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Flashcards</a>
+            <a href="/Dashboard/kanji" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Kanji</a>
+
+            <!-- User Info (Desktop) -->
+          </nav>
+
+          <!-- Mobile Menu Button -->
+          <div class="md:hidden flex items-center">
+            <div id="userInfoMobile" class="hidden flex items-center mr-4">
+              <span id="userNameMobile" class="text-sm text-gray-600 truncate max-w-xs"></span>
+            </div>
+            <button id="mobile-menu-button" class="text-gray-500 hover:text-gray-900 focus:outline-none">
+              <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Menu (Hidden by default) -->
+      <div id="mobile-menu" class="fixed inset-0 z-40 hidden">
+        <!-- Overlay -->
+        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" id="mobile-menu-overlay"></div>
+
+        <!-- Menu Container (Slides from right) -->
+        <div class="fixed inset-y-0 right-0 max-w-xs w-full bg-white shadow-xl transform transition-transform duration-300 ease-in-out translate-x-full">
+          <div class="flex flex-col h-full">
+            <!-- Menu Header -->
+            <div class="flex justify-between items-center px-4 py-4 border-b">
+              <h2 class="text-lg font-medium">Menu</h2>
+              <button id="mobile-menu-close" class="text-gray-500 hover:text-gray-900">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <!-- Menu Items -->
+            <div class="flex-1 overflow-y-auto px-4 py-6 space-y-4">
+              <a href="/Dashboard/user" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
+              <a href="/Dashboard/roadmap" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Roadmap</a>
+              <a href="/Dashboard/flashcards" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Flashcards</a>
+              <a href="/Dashboard/kanji" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Kanji</a>
+            </div>
+
+            <!-- Footer with Sign Out -->
+            <div class="px-4 py-4 border-t">
+              <div id="userInfo" class="hidden flex items-center ml-4">
+                <span id="userName" class="text-sm text-gray-600 truncate max-w-xs"></span>
+                <button onclick="signOut()" class="ml-4 px-3 py-1 text-sm bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors">Signout</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- Progress Overview -->
+      <div id="progressOverview" class="hidden mb-8 bg-white rounded-xl shadow-md p-6 border border-gray-100">
+        <h2 class="text-xl font-semibold mb-4 text-gray-800">Progress Pembelajaran Anda</h2>
+        <div class="flex items-center space-x-4">
+          <div class="flex-1 bg-gray-200 rounded-full h-3 overflow-hidden">
+            <div id="progressBar" class="bg-gradient-to-r from-purple-500 to-pink-500 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+          </div>
+          <span id="progressText" class="text-sm font-medium text-gray-600">0%</span>
+        </div>
+        <div class="mt-2 text-sm text-gray-500"><span id="completedLessons" class="font-medium">0</span> dari <span id="totalLessons" class="font-medium">0</span> pelajaran selesai</div>
+      </div>
+
+      <!-- Roadmap Visualization -->
+      <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-gray-100 overflow-hidden">
+        <div class="relative">
+          <!-- Main Branch -->
+          <div class="flex flex-col items-center space-y-8">
+            <!-- Introduction -->
+            <div class="roadmap-node relative group" data-topic="introduction">
+              <div class="bg-gradient-to-br from-green-400 to-green-500 text-white px-8 py-4 rounded-full font-semibold cursor-pointer hover:shadow-lg transition-all duration-300 transform group-hover:scale-105 shadow-md">
+                Introduction
+                <div class="absolute -top-2 -right-2 bg-yellow-400 text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center text-gray-800 shadow-sm">1</div>
+              </div>
+              <div class="mt-4 text-center bg-gray-50 p-4 rounded-xl border border-gray-200 max-w-xs mx-auto">
+                <div class="text-sm text-gray-600 space-y-2">
+                  <div class="flex items-center">
+                    <div class="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                    <span>cara melakukan perkenalan dengan baik</span>
+                  </div>
+                  <div class="flex items-center">
+                    <div class="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                    <span>menyatakan dan menyebutkan umur</span>
+                  </div>
+                  <div class="flex items-center">
+                    <div class="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                    <span>menyatakan dan menyebutkan hobi</span>
+                  </div>
+                  <div class="flex items-center">
+                    <div class="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                    <span>menyatakan tempat tinggal atau asal</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Connecting Line -->
+            <div class="w-1 h-16 bg-gradient-to-b from-purple-300 to-pink-300 rounded-full"></div>
+
+            <!-- Family -->
+            <div class="roadmap-node relative group" data-topic="family">
+              <div class="bg-gradient-to-br from-purple-400 to-purple-500 text-white px-8 py-4 rounded-full font-semibold cursor-pointer hover:shadow-lg transition-all duration-300 transform group-hover:scale-105 shadow-md">
+                Family
+                <div class="absolute -top-2 -right-2 bg-yellow-400 text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center text-gray-800 shadow-sm">2</div>
+              </div>
+              <div class="mt-4 text-center bg-gray-50 p-4 rounded-xl border border-gray-200 max-w-xs mx-auto">
+                <div class="text-sm text-gray-600 space-y-2">
+                  <div class="flex items-center">
+                    <div class="w-2 h-2 bg-purple-400 rounded-full mr-2"></div>
+                    <span>menyebutkan jumlah anggota keluarga</span>
+                  </div>
+                  <div class="flex items-center">
+                    <div class="w-2 h-2 bg-purple-400 rounded-full mr-2"></div>
+                    <span>menyatakan nama anggota keluarga</span>
+                  </div>
+                  <div class="flex items-center">
+                    <div class="w-2 h-2 bg-purple-400 rounded-full mr-2"></div>
+                    <span>menyatakan umur anggota keluarga</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Connecting Line -->
+            <div class="w-1 h-16 bg-gradient-to-b from-purple-300 to-pink-300 rounded-full"></div>
+
+            <!-- Branch for Greetings and Numbers -->
+            <div class="flex flex-col md:flex-row md:space-x-16 space-y-8 md:space-y-0">
+              <!-- Greetings -->
+              <div class="roadmap-node relative group" data-topic="greetings">
+                <div class="bg-gradient-to-br from-pink-500 to-pink-600 text-white px-8 py-4 rounded-full font-semibold cursor-pointer hover:shadow-lg transition-all duration-300 transform group-hover:scale-105 shadow-md">
+                  Greetings
+                  <div class="absolute -top-2 -right-2 bg-yellow-400 text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center text-gray-800 shadow-sm">3</div>
+                </div>
+                <div class="mt-4 text-center bg-gray-50 p-4 rounded-xl border border-gray-200 max-w-xs mx-auto">
+                  <div class="text-sm text-gray-600 space-y-2">
+                    <div class="flex items-center">
+                      <div class="w-2 h-2 bg-pink-400 rounded-full mr-2"></div>
+                      <span>mempelajari salam sesuai kondisi</span>
+                    </div>
+                    <div class="flex items-center">
+                      <div class="w-2 h-2 bg-pink-400 rounded-full mr-2"></div>
+                      <span>mempelajari jenis ungkapan salam</span>
+                    </div>
+                    <div class="flex items-center">
+                      <div class="w-2 h-2 bg-pink-400 rounded-full mr-2"></div>
+                      <span>contoh jenis ungkapan salam</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Numbers -->
+              <div class="roadmap-node relative group" data-topic="numbers">
+                <div class="bg-gradient-to-br from-red-500 to-red-600 text-white px-8 py-4 rounded-full font-semibold cursor-pointer hover:shadow-lg transition-all duration-300 transform group-hover:scale-105 shadow-md">
+                  Number
+                  <div class="absolute -top-2 -right-2 bg-yellow-400 text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center text-gray-800 shadow-sm">4</div>
+                </div>
+                <div class="mt-4 text-center bg-gray-50 p-4 rounded-xl border border-gray-200 max-w-xs mx-auto">
+                  <div class="text-sm text-gray-600 space-y-2">
+                    <div class="flex items-center">
+                      <div class="w-2 h-2 bg-red-400 rounded-full mr-2"></div>
+                      <span>mempelajari penyebutan angka 1-10</span>
+                    </div>
+                    <div class="flex items-center">
+                      <div class="w-2 h-2 bg-red-400 rounded-full mr-2"></div>
+                      <span>penyebutan angka lanjutan</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Connecting Line -->
+            <div class="w-1 h-16 bg-gradient-to-b from-purple-300 to-pink-300 rounded-full"></div>
+
+            <!-- Birthday -->
+            <div class="roadmap-node relative group" data-topic="birthday">
+              <div class="bg-gradient-to-br from-orange-500 to-orange-600 text-white px-8 py-4 rounded-full font-semibold cursor-pointer hover:shadow-lg transition-all duration-300 transform group-hover:scale-105 shadow-md">
+                Birthday
+                <div class="absolute -top-2 -right-2 bg-yellow-400 text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center text-gray-800 shadow-sm">5</div>
+              </div>
+              <div class="mt-4 text-center bg-gray-50 p-4 rounded-xl border border-gray-200 max-w-xs mx-auto">
+                <div class="text-sm text-gray-600 space-y-2">
+                  <div class="flex items-center">
+                    <div class="w-2 h-2 bg-orange-400 rounded-full mr-2"></div>
+                    <span>Cara menyatakan ulang tahun</span>
+                  </div>
+                  <div class="flex items-center">
+                    <div class="w-2 h-2 bg-orange-400 rounded-full mr-2"></div>
+                    <span>Cara menanyakan ulang tahun </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col md:flex-row md:space-x-16 space-y-8 md:space-y-0">
+              <!-- Greetings -->
+              <div class="roadmap-node relative group" data-topic="invitation">
+                <div class="bg-gradient-to-br from-green-500 to-green-600 text-white px-8 py-4 rounded-full font-semibold cursor-pointer hover:shadow-lg transition-all duration-300 transform group-hover:scale-105 shadow-md">
+                  Invitation
+                  <div class="absolute -top-2 -right-2 bg-yellow-400 text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center text-gray-800 shadow-sm">6</div>
+                </div>
+                <div class="mt-4 text-center bg-gray-50 p-4 rounded-xl border border-gray-200 max-w-xs mx-auto">
+                  <div class="text-sm text-gray-600 space-y-2">
+                    <div class="flex items-center">
+                      <div class="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                      <span>menawarkan & menerima ajakan</span>
+                    </div>
+                    <div class="flex items-center">
+                      <div class="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                      <span>menolak dan membatalkan</span>
+                    </div>
+                    <div class="flex items-center">
+                      <div class="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                      <span>penggunaan di situasi nyata</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Numbers -->
+              <div class="roadmap-node relative group" data-topic="skills">
+                <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white px-8 py-4 rounded-full font-semibold cursor-pointer hover:shadow-lg transition-all duration-300 transform group-hover:scale-105 shadow-md">
+                  Skills
+                  <div class="absolute -top-2 -right-2 bg-yellow-400 text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center text-gray-800 shadow-sm">7</div>
+                </div>
+                <div class="mt-4 text-center bg-gray-50 p-4 rounded-xl border border-gray-200 max-w-xs mx-auto">
+                  <div class="text-sm text-gray-600 space-y-2">
+                    <div class="flex items-center">
+                      <div class="w-2 h-2 bg-blue-400 rounded-full mr-2"></div>
+                      <span>menyatakan kemahiran</span>
+                    </div>
+                    <div class="flex items-center">
+                      <div class="w-2 h-2 bg-blue-400 rounded-full mr-2"></div>
+                      <span>kemahiran dalam bentuk pasif dan aktif</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Connecting Line -->
+            <div class="w-1 h-16 bg-gradient-to-b from-yellow-300 to-green-300 rounded-full"></div>
+
+            <!-- Konbini -->
+            <div class="roadmap-node relative group" data-topic="konbini">
+              <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 text-white px-8 py-4 rounded-full font-semibold cursor-pointer hover:shadow-lg transition-all duration-300 transform group-hover:scale-105 shadow-md">
+                Konbini
+                <div class="absolute -top-2 -right-2 bg-yellow-400 text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center text-gray-800 shadow-sm">8</div>
+              </div>
+              <div class="mt-4 text-center bg-gray-50 p-4 rounded-xl border border-gray-200 max-w-xs mx-auto">
+                <div class="text-sm text-gray-600 space-y-2">
+                  <div class="flex items-center">
+                    <div class="w-2 h-2 bg-yellow-400 rounded-full mr-2"></div>
+                    <span>Membeli makanan dan minuman</span>
+                  </div>
+                  <div class="flex items-center">
+                    <div class="w-2 h-2 bg-yellow-400 rounded-full mr-2"></div>
+                    <span>Menanyakan makanan halal</span>
+                  </div>
+                  <div class="flex items-center">
+                    <div class="w-2 h-2 bg-yellow-400 rounded-full mr-2"></div>
+                    <span>Menanyakan Harga</span>
+                  </div>
+                  <div class="flex items-center">
+                    <div class="w-2 h-2 bg-yellow-400 rounded-full mr-2"></div>
+                    <span>Melakukan pembayaran</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col md:flex-row md:space-x-16 space-y-8 md:space-y-0">
+              <!-- Flavour-->
+              <div class="roadmap-node relative group" data-topic="flavour">
+                <div class="bg-gradient-to-br from-green-500 to-green-600 text-white px-8 py-4 rounded-full font-semibold cursor-pointer hover:shadow-lg transition-all duration-300 transform group-hover:scale-105 shadow-md">
+                  Flavour
+                  <div class="absolute -top-2 -right-2 bg-yellow-400 text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center text-gray-800 shadow-sm">9</div>
+                </div>
+                <div class="mt-4 text-center bg-gray-50 p-4 rounded-xl border border-gray-200 max-w-xs mx-auto">
+                  <div class="text-sm text-gray-600 space-y-2">
+                    <div class="flex items-center">
+                      <div class="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                      <span>Menyatakan rasa pada makanan</span>
+                    </div>
+                    <div class="flex items-center">
+                      <div class="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                      <span>Menyatakan makanan enak</span>
+                    </div>
+                    <div class="flex items-center">
+                      <div class="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                      <span>Menyatakan jenis rasa</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Rent a bike -->
+              <div class="roadmap-node relative group" data-topic="rent-bike">
+                <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white px-8 py-4 rounded-full font-semibold cursor-pointer hover:shadow-lg transition-all duration-300 transform group-hover:scale-105 shadow-md">
+                  Rent a Bike
+                  <div class="absolute -top-2 -right-2 bg-yellow-400 text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center text-gray-800 shadow-sm">10</div>
+                </div>
+                <div class="mt-4 text-center bg-gray-50 p-4 rounded-xl border border-gray-200 max-w-xs mx-auto">
+                  <div class="text-sm text-gray-600 space-y-2">
+                    <div class="flex items-center">
+                      <div class="w-2 h-2 bg-blue-400 rounded-full mr-2"></div>
+                      <span>Cara menyewa sepeda</span>
+                    </div>
+                    <div class="flex items-center">
+                      <div class="w-2 h-2 bg-blue-400 rounded-full mr-2"></div>
+                      <span>Hal yg harus dipersiapkan</span>
+                    </div>
+                    <div class="flex items-center">
+                      <div class="w-2 h-2 bg-blue-400 rounded-full mr-2"></div>
+                      <span>Cara melakukan pembayaran</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!--  -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Learning Modal -->
+    <div id="learningModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 backdrop-blur-sm">
+      <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl border border-gray-200">
+          <div class="flex justify-between items-center p-6 border-b">
+            <h2 id="modalTitle" class="text-2xl font-bold text-gray-900"></h2>
+            <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 transition-colors">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+
+          <div class="p-6 overflow-y-auto" style="max-height: calc(90vh - 200px)">
+            <div id="loadingContent" class="text-center py-8">
+              <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto"></div>
+              <p class="mt-4 text-gray-600">Memuat konten pembelajaran...</p>
+            </div>
+            <div id="modalContent" class="hidden"></div>
+          </div>
+
+          <div class="border-t p-6 bg-gray-50">
+            <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+              <div id="progressInfo" class="text-sm text-gray-600 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Waktu belajar: <span id="studyTime" class="font-medium ml-1">0</span> menit
+              </div>
+              <div class="space-x-3 flex">
+                <button id="quizBtn" onclick="startQuiz()" class="hidden px-6 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-full hover:shadow-md transition-all transform hover:scale-105 shadow-sm">Mulai Quiz</button>
+                <button onclick="closeModal()" class="px-6 py-2 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-full hover:shadow-md transition-all transform hover:scale-105 shadow-sm">Tutup</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quiz Modal -->
+    <div id="quizModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 backdrop-blur-sm">
+      <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-gray-200">
+          <div class="flex justify-between items-center p-6 border-b">
+            <h2 id="quizTitle" class="text-2xl font-bold text-gray-900">Quiz</h2>
+            <button onclick="closeQuizModal()" class="text-gray-500 hover:text-gray-700 transition-colors">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+
+          <div class="p-6 overflow-y-auto" style="max-height: calc(90vh - 200px)">
+            <div id="quizLoadingContent" class="text-center py-8">
+              <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto"></div>
+              <p class="mt-4 text-gray-600">Memuat quiz...</p>
+            </div>
+            <div id="quizContent" class="hidden"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/Dashboard/JS/roadmap.js"></script>
+    <script>
+      // Mobile menu functionality
+      const mobileMenuButton = document.getElementById("mobile-menu-button");
+      const mobileMenuClose = document.getElementById("mobile-menu-close");
+      const mobileMenu = document.getElementById("mobile-menu");
+      const mobileMenuOverlay = document.getElementById("mobile-menu-overlay");
+      const mobileMenuContainer = mobileMenu.querySelector(".max-w-xs");
+
+      function openMobileMenu() {
+        mobileMenu.classList.remove("hidden");
+        setTimeout(() => {
+          mobileMenuOverlay.classList.remove("opacity-0");
+          mobileMenuContainer.classList.remove("translate-x-full");
+        }, 20);
+      }
+
+      function closeMobileMenu() {
+        mobileMenuOverlay.classList.add("opacity-0");
+        mobileMenuContainer.classList.add("translate-x-full");
+        setTimeout(() => {
+          mobileMenu.classList.add("hidden");
+        }, 300);
+      }
+
+      mobileMenuButton.addEventListener("click", openMobileMenu);
+      mobileMenuClose.addEventListener("click", closeMobileMenu);
+      mobileMenuOverlay.addEventListener("click", closeMobileMenu);
+
+      // Close menu when clicking outside
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && !mobileMenu.classList.contains("hidden")) {
+          closeMobileMenu();
+        }
+      });
+    </script>
+  </body>
+</html>
