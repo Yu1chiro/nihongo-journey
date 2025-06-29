@@ -171,6 +171,9 @@ app.get("/Dashboard/roadmap", authenticateUser, (req, res) => {
 app.get("/Dashboard/flashcards", authenticateUser, (req, res) => {
   res.sendFile(path.join(__dirname, "public", "Dashboard", "flashcards.html"));
 });
+app.get("/Dashboard/conversation", authenticateUser, (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "Dashboard", "conversation.html"));
+});
 app.get("/Dashboard/kanji", authenticateUser, (req, res) => {
   res.sendFile(path.join(__dirname, "public", "Dashboard", "kanji.html"));
 });
@@ -1012,6 +1015,187 @@ Jawab dalam format JSON seperti contoh berikut (jangan tambahkan markdown atau p
     res.status(500).json({ error: "Failed to generate quiz content" });
   }
 });
+// Fungsi untuk generate konten Gemini
+
+app.post("/api/generateconversation", authenticateUser, async (req, res) => {
+  try {
+    const { topic, userInput, conversationType, conversationHistory } = req.body;
+
+    // Validasi input
+    if (!topic) {
+      return res.status(400).json({ error: "Topic is required" });
+    }
+
+    let prompt = "";
+    
+    // Buat prompt berdasarkan tipe conversation
+  switch (topic.toLowerCase()) {
+  case "jikoushokai":
+    if (conversationType === "start") {
+      prompt = `Kamu adalah suzuki sensei. Mulailah percakapan perkenalan diri (jikoushokai) secara alami dalam bahasa Jepang. 
+Sapa dia dan mintalah dia untuk memperkenalkan diri. Balas HANYA dalam bahasa Jepang seperti penutur asli.
+Gunakan bahasa Jepang tingkat pemula hingga menengah. Maksimal 2-3 kalimat.
+Respon kamu harus berupa teks bahasa Jepang murni saja – tanpa penjelasan, tanpa romaji, tanpa bahasa lain dan tanpa emoji.
+
+Contoh format respons: こんにちは！自己紹介させていただきませんか？まず、お名前は何ですか？`;
+    } else {
+      prompt = `Kamu adalah suzuki sensei bahasa Jepang yang sedang berlatih jikoushokai (perkenalan diri).
+
+Riwayat percakapan:
+${conversationHistory || ""}
+
+Murid berkata: "${userInput}"
+
+Balas secara alami dalam bahasa Jepang seperti seorang sensei. Tanyakan pertanyaan lanjutan, seperti 何歳ですか？何が好きですか？どうして日本語を勉強しますか？ 
+berikan komentar positif, atau minta detail lebih lanjut. Gunakan bahasa Jepang tingkat pemula-menengah.
+Maksimal 2-3 kalimat. Balas HANYA dengan teks bahasa Jepang murni – tanpa bahasa lain. dan tanpa emoji`;
+    }
+    break;
+
+  case "yasumi":
+    if (conversationType === "start") {
+      prompt = `Kamu adalah suzuki sensei bahasa Jepang. Mulailah percakapan alami tentang yasumi (liburan) dalam bahasa Jepang.
+Tanyakan tentang rencana liburan mereka atau pengalaman liburan terbaru. Balas HANYA dalam bahasa Jepang seperti penutur asli.
+Gunakan bahasa Jepang tingkat pemula hingga menengah. Maksimal 2-3 kalimat.
+Respon kamu harus berupa teks bahasa Jepang murni saja – tanpa penjelasan, tanpa romaji, tanpa bahasa lain, tanpa emoji!
+
+Contoh format respons: 今度の休みはどこに行きますか？何か楽しい予定がありますか？`;
+    } else {
+      prompt = `Kamu adalah suzuki sensei bahasa Jepang yang sedang berlatih percakapan yasumi (liburan).
+
+Riwayat percakapan:
+${conversationHistory || ""}
+
+Murid berkata: "${userInput}"
+
+Balas secara alami dalam bahasa Jepang tentang liburan. Tanyakan pertanyaan lanjutan, bagikan pengalaman,
+atau beri komentar tentang tempat/kegiatan. Gunakan bahasa Jepang tingkat pemula-menengah.
+Maksimal 2-3 kalimat. Balas HANYA dengan teks bahasa Jepang murni – tanpa bahasa lain. dan tanpa emoji`;
+    }
+    break;
+
+  case "ryoukou":
+    if (conversationType === "start") {
+      prompt = `Kamu adalah suzuki sensei bahasa Jepang. Mulailah percakapan alami tentang ryoukou (perjalanan) dalam bahasa Jepang.
+Tanyakan tentang tempat yang ingin mereka kunjungi atau pengalaman perjalanan mereka. Balas HANYA dalam bahasa Jepang seperti penutur asli.
+Gunakan bahasa Jepang tingkat pemula hingga menengah. Maksimal 2-3 kalimat.
+Respon kamu harus berupa teks bahasa Jepang murni saja – tanpa penjelasan, tanpa romaji, tanpa bahasa lain dan tanpa emoji.
+
+Contoh format respons: どこか旅行に行きたい場所がありますか？今まで一番良かった旅行先はどこですか？`;
+    } else {
+      prompt = `Kamu adalah suzuki sensei bahasa Jepang yang sedang berlatih percakapan ryoukou (perjalanan).
+
+Riwayat percakapan:
+${conversationHistory || ""}
+
+Murid berkata: "${userInput}"
+
+Balas secara alami dalam bahasa Jepang tentang perjalanan. Berikan rekomendasi, tanyakan pengalaman perjalanan,
+atau bagikan informasi menarik. Gunakan bahasa Jepang tingkat pemula-menengah.
+Maksimal 2-3 kalimat. Balas HANYA dengan teks bahasa Jepang murni – tanpa bahasa lain. dan tanpa emoji`;
+    }
+    break;
+
+  default:
+    return res.status(400).json({ error: "Topik percakapan tidak didukung" });
+}
+
+
+    // Generate respons dari Gemini
+    const geminiResponse = await generateGeminiContent(prompt);
+
+    // Simpan progress conversation
+    if (req.user && req.user.uid) {
+      try {
+        const conversationRef = db.ref(`users/${req.user.uid}/conversations/${topic}`);
+        const conversationData = {
+          lastPractice: admin.database.ServerValue.TIMESTAMP,
+          totalSessions: admin.database.ServerValue.increment(1),
+          topic: topic
+        };
+        
+        await conversationRef.update(conversationData);
+      } catch (saveError) {
+        console.error("Error saving conversation progress:", saveError);
+        // Tidak perlu return error, karena ini bukan critical failure
+      }
+    }
+
+    res.json({
+      success: true,
+      response: geminiResponse,
+      topic: topic,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error("Generate conversation error:", error);
+    res.status(500).json({ 
+      error: "Failed to generate conversation",
+      details: error.message 
+    });
+  }
+});
+
+// Endpoint untuk save conversation 
+app.post("/api/conversation/progress", authenticateUser, async (req, res) => {
+  try {
+    const { topic, duration, completed } = req.body;
+
+    if (!topic || !duration) {
+      return res.status(400).json({ error: "Topic and duration are required" });
+    }
+
+    const progressRef = db.ref(`users/${req.user.uid}/progress/conversation_${topic}`);
+    const snapshot = await progressRef.once("value");
+    const currentProgress = snapshot.val() || {};
+
+    const updateData = {
+      totalStudyTime: (currentProgress.totalStudyTime || 0) + duration,
+      totalSessions: (currentProgress.totalSessions || 0) + 1,
+      lastStudy: admin.database.ServerValue.TIMESTAMP,
+      topic: topic
+    };
+
+    if (completed) {
+      updateData.completed = true;
+      updateData.completedAt = admin.database.ServerValue.TIMESTAMP;
+    }
+
+    await progressRef.update(updateData);
+
+    res.json({
+      success: true,
+      message: "Conversation progress saved successfully",
+      progress: updateData
+    });
+
+  } catch (error) {
+    console.error("Error saving conversation progress:", error);
+    res.status(500).json({ error: "Failed to save conversation progress" });
+  }
+});
+// GET progress conversation list
+app.get("/api/conversation/progress", authenticateUser, async (req, res) => {
+  try {
+    const ref = db.ref(`users/${req.user.uid}/progress`);
+    const snapshot = await ref.once("value");
+    const data = snapshot.val() || {};
+    
+    // Hanya ambil yang berawalan conversation_
+    const filtered = {};
+    Object.keys(data).forEach(key => {
+      if (key.startsWith("conversation_")) {
+        filtered[key] = data[key];
+      }
+    });
+
+    res.json(filtered);
+  } catch (error) {
+    console.error("Error getting conversation progress:", error);
+    res.status(500).json({ error: "Failed to get conversation progress" });
+  }
+});
 
 //ENDPOINT SAVE PROGRESS USER
 app.get("/api/progress/:type", authenticateUser, async (req, res, next) => {
@@ -1044,8 +1228,6 @@ app.get("/api/progress/:type", authenticateUser, async (req, res, next) => {
     res.status(500).json({ error: "Failed to fetch flashcard progress" });
   }
 });
-
-// 2. Endpoint untuk PROGRESS ROADMAP (Kode Anda, tidak diubah)
 // Rute ini akan menangani /api/progress/USER_ID_ANDA
 app.get("/api/progress/:uid", authenticateUser, async (req, res) => {
   try {
@@ -1075,7 +1257,7 @@ app.get("/api/progress/:uid", authenticateUser, async (req, res) => {
   }
 });
 
-// 3. Endpoint untuk UPDATE PROGRESS ROADMAP (Kode Anda, tidak diubah)
+// 3. Endpoint untuk UPDATE PROGRESS ROADMAP CORE POINT PROGRESS
 app.post("/api/progress/:uid", authenticateUser, async (req, res) => {
   try {
     const { uid } = req.params;

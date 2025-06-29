@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Japanese Conversation Practice</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+
+</head>
+<body class="bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-xl font-bold text-white mb-2">Conversation Practice</h1>
+        </div>
+
+        <!-- Topic Selection -->
+        <div class="max-w-4xl mx-auto mb-8">
+            <div class="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
+                <h2 class="text-2xl font-bold text-white mb-4">Choose Conversation Topic</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <button onclick="startConversation('jikoushokai')" 
+                            class="conversation-topic bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-lg transition-all duration-300 transform hover:scale-105">
+                        <div class="text-xl font-bold mb-2">自己紹介</div>
+                        <div class="text-sm opacity-90">Jikoushokai</div>
+                        <div class="text-xs opacity-75">Self Introduction</div>
+                    </button>
+                    <button onclick="startConversation('yasumi')" 
+                            class="conversation-topic bg-green-600 hover:bg-green-700 text-white p-4 rounded-lg transition-all duration-300 transform hover:scale-105">
+                        <div class="text-xl font-bold mb-2">休み</div>
+                        <div class="text-sm opacity-90">Yasumi</div>
+                        <div class="text-xs opacity-75">Holiday/Vacation</div>
+                    </button>
+                    <button onclick="startConversation('ryoukou')" 
+                            class="conversation-topic bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-lg transition-all duration-300 transform hover:scale-105">
+                        <div class="text-xl font-bold mb-2">旅行</div>
+                        <div class="text-sm opacity-90">Ryoukou</div>
+                        <div class="text-xs opacity-75">Travel</div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timer Settings -->
+        <div class="max-w-2xl mx-auto mb-8">
+            <div class="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
+                <h3 class="text-xl font-bold text-white mb-4">Conversation Duration</h3>
+                <div class="flex gap-4 justify-center">
+                    <button onclick="setDuration(300)" 
+                            class="duration-btn bg-orange-600 hover:bg-orange-700 text-white px-3 py-3 rounded-lg transition-all duration-300">
+                        5 Minutes
+                    </button>
+                    <button onclick="setDuration(600)" 
+                            class="duration-btn bg-red-600 hover:bg-red-700 text-white px-3 py-3 rounded-lg transition-all duration-300">
+                        10 Minutes
+                    </button>
+                    <button onclick="setDuration(900)" 
+                            class="duration-btn bg-red-600 hover:bg-red-700 text-white px-3 py-3 rounded-lg transition-all duration-300">
+                        15 Minutes
+                    </button>
+                </div>
+                <div class="text-center mt-4">
+                    <div id="timer-display" class="text-2xl font-bold text-white">
+                        Selected: <span id="selected-duration">5 Minute</span>
+                    </div>
+                    <div id="countdown" class="text-xl text-yellow-300 mt-2 hidden">
+                        Time remaining: <span id="time-left">5:00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conversation Area -->
+        <div id="conversation-area" class="max-w-4xl mx-auto hidden">
+            <div class="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-white">Conversation: <span id="current-topic"></span></h3>
+                    <button onclick="endConversation()" 
+                            class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-all duration-300">
+                        End Conversation
+                    </button>
+                </div>
+
+                <!-- Chat Messages -->
+                <div id="chat-messages" class="bg-black/30 rounded-lg p-4 h-64 overflow-y-auto mb-4 space-y-3">
+                    <!-- Messages will be added here -->
+                </div>
+
+                <!-- Voice Controls -->
+                <div class="flex flex-col sm:flex-row gap-4 items-center justify-center">
+                    <button id="record-btn" onclick="toggleRecording()" 
+                            class="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white px-6 py-3 rounded-lg transition-all duration-300 flex items-center gap-2">
+                        <span id="record-icon">🎤</span>
+                        <span id="record-text">Start Recording</span>
+                    </button>
+                    
+                    <button id="play-response-btn" onclick="playLastResponse()" 
+                            class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white px-6 py-3 rounded-lg transition-all duration-300 flex items-center gap-2 hidden">
+                        <span>🔊</span>
+                        <span>Play Response</span>
+                    </button>
+                    
+                    <button onclick="testSpeech()" 
+                            class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-all duration-300 text-sm">
+                        Test Audio
+                    </button>
+                </div>
+                
+                <!-- Debug Info -->
+                <div id="debug-info" class="mt-4 text-xs text-gray-400 hidden">
+                    <div>Browser: <span id="browser-info"></span></div>
+                    <div>Speech Support: <span id="speech-support"></span></div>
+                    <div>Available Voices: <span id="voice-count">Loading...</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Display -->
+        <div id="progress-area" class="hidden max-w-2xl mx-auto">
+            <div class="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
+                <h3 class="text-xl font-bold text-white mb-4">Your Progress</h3>
+                <div id="progress-content" class="text-gray-300">
+                    Start a conversation to see your progress!
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="max-w-4xl mx-auto p-5">
+        <h1 class="text-3xl font-bold text-white mb-4">Your Progress</h1>
+        
+        <!-- Container untuk semua progress -->
+        <div id="progressContainer" class="space-y-4">
+            <!-- Progress akan ditampilkan di sini -->
+        </div>
+        
+        <!-- Loading state -->
+        <div id="loading" class="text-center py-8">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+            <p class="text-white mt-4">Memuat progress...</p>
+        </div>
+        
+        <!-- Empty state -->
+        <div id="emptyState" class="text-center py-8 hidden">
+            <div class="text-gray-400 text-xl mb-4">📚</div>
+            <p class="text-white">Belum ada progress conversation yuk practice dlu!</p>
+        </div>
+    </div>
+<script src="/Dashboard/JS/kaiwa.js"></script>
+   <script>
+    let currentTopic = '';
+let conversationHistory = '';
+let selectedDuration = 60; // default 1 minute
+let conversationTimer = null;
+let startTime = null;
+let isRecording = false;
+let mediaRecorder = null;
+let audioChunks = [];
+let lastAIResponse = '';
+
+// Speech Recognition
+let recognition = null;
+if ('webkitSpeechRecognition' in window) {
+    recognition = new webkitSpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'ja-JP';
+}
+
+function setDuration(seconds) {
+    selectedDuration = seconds;
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    const display = remainingSeconds > 0 ? `${minutes}:${remainingSeconds.toString().padStart(2, '0')}` : `${minutes} Minute${minutes > 1 ? 's' : ''}`;
+    document.getElementById('selected-duration').textContent = display;
+    
+    // Update button styles
+    document.querySelectorAll('.duration-btn').forEach(btn => {
+        btn.classList.remove('ring-4', 'ring-white/50');
+    });
+    event.target.classList.add('ring-4', 'ring-white/50');
+}
+
+async function startConversation(topic) {
+    currentTopic = topic;
+    document.getElementById('current-topic').textContent = topic.charAt(0).toUpperCase() + topic.slice(1);
+    document.getElementById('conversation-area').classList.remove('hidden');
+    
+    // Clear previous messages
+    document.getElementById('chat-messages').innerHTML = '';
+    conversationHistory = '';
+    
+    // Start timer
+    startTime = Date.now();
+    startTimer();
+    
+    // Get initial AI response
+    try {
+        const response = await fetch('/api/generateconversation', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                topic: topic,
+                conversationType: 'start'
+            })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            lastAIResponse = data.response;
+            addMessage('Sensei', data.response);
+            
+            // Add small delay before auto-play
+            setTimeout(() => {
+                console.log('Auto-playing Sensei response:', data.response);
+                speakText(data.response);
+            }, 500);
+            
+            conversationHistory += `Sensei: ${data.response}\n`;
+            document.getElementById('play-response-btn').classList.remove('hidden');
+        }
+    } catch (error) {
+        console.error('Error starting conversation:', error);
+        addMessage('System', 'Sorry, there was an error starting the conversation.');
+    }
+}
+
+function startTimer() {
+    const countdownElement = document.getElementById('countdown');
+    const timeLeftElement = document.getElementById('time-left');
+    
+    countdownElement.classList.remove('hidden');
+    
+    let timeRemaining = selectedDuration;
+    
+    conversationTimer = setInterval(() => {
+        timeRemaining--;
+        
+        const minutes = Math.floor(timeRemaining / 60);
+        const seconds = timeRemaining % 60;
+        timeLeftElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
+        if (timeRemaining <= 0) {
+            endConversation();
+        }
+    }, 1000);
+}
+
+async function endConversation() {
+    // ===== MODIFIKASI: HENTIKAN PAKSA TEXT-TO-SPEECH =====
+    // Stop speech synthesis immediately when timer ends
+    if ('speechSynthesis' in window) {
+        speechSynthesis.cancel();
+        console.log('Speech synthesis forcefully stopped due to timer end');
+    }
+    
+    // Stop speech recognition if active
+    if (isRecording && recognition) {
+        recognition.stop();
+        stopRecording();
+        console.log('Speech recognition stopped due to timer end');
+    }
+    // ===== END MODIFIKASI =====
+    
+    if (conversationTimer) {
+        clearInterval(conversationTimer);
+        conversationTimer = null;
+    }
+    
+    document.getElementById('countdown').classList.add('hidden');
+    document.getElementById('conversation-area').classList.add('hidden');
+    document.getElementById('play-response-btn').classList.add('hidden');
+    
+    // Reset play button visual state
+    document.getElementById('play-response-btn').classList.remove('opacity-50');
+    
+    // Calculate actual duration
+    const actualDuration = startTime ? Math.floor((Date.now() - startTime) / 1000) : selectedDuration;
+    
+    // Save progress
+    if (currentTopic) {
+        try {
+            await fetch('/api/conversation/progress', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    topic: currentTopic,
+                    duration: actualDuration,
+                    completed: true
+                })
+            });
+            
+            updateProgressDisplay(currentTopic, actualDuration);
+        } catch (error) {
+            console.error('Error saving progress:', error);
+        }
+    }
+    
+    // Reset
+    currentTopic = '';
+    conversationHistory = '';
+    startTime = null;
+}
+
+function toggleRecording() {
+    if (!isRecording) {
+        startRecording();
+    } else {
+        stopRecording();
+    }
+}
+
+function startRecording() {
+    if (!recognition) {
+        alert('Speech recognition is not supported in your browser. Please use Chrome.');
+        return;
+    }
+    
+    isRecording = true;
+    document.getElementById('record-text').textContent = 'Recording...';
+    document.getElementById('record-icon').textContent = '⏹️';
+    document.getElementById('record-btn').classList.remove('bg-green-600', 'hover:bg-green-700');
+    document.getElementById('record-btn').classList.add('bg-red-600', 'hover:bg-red-700');
+    
+    recognition.start();
+    
+    recognition.onresult = async function(event) {
+        const transcript = event.results[0][0].transcript;
+        addMessage('You', transcript);
+        conversationHistory += `User: ${transcript}\n`;
+        
+        // Send to AI for response
+        try {
+            const response = await fetch('/api/generateconversation', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    topic: currentTopic,
+                    userInput: transcript,
+                    conversationType: 'continue',
+                    conversationHistory: conversationHistory
+                })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                lastAIResponse = data.response;
+                addMessage('Sensei', data.response);
+                
+                // Add small delay before auto-play
+                setTimeout(() => {
+                    console.log('Auto-playing Sensei response:', data.response);
+                    speakText(data.response);
+                }, 500);
+                
+                conversationHistory += `Sensei : ${data.response}\n`;
+            }
+        } catch (error) {
+            console.error('Error getting Sensei response:', error);
+            addMessage('System', 'Sorry, there was an error processing your response.');
+        }
+        
+        stopRecording();
+    };
+    
+    recognition.onerror = function(event) {
+        console.error('Speech recognition error:', event.error);
+        addMessage('System', 'Speech recognition error. Please try again.');
+        stopRecording();
+    };
+}
+
+function stopRecording() {
+    isRecording = false;
+    document.getElementById('record-text').textContent = 'Start Recording';
+    document.getElementById('record-icon').textContent = '🎤';
+    document.getElementById('record-btn').classList.remove('bg-red-600', 'hover:bg-red-700');
+    document.getElementById('record-btn').classList.add('bg-green-600', 'hover:bg-green-700');
+    
+    if (recognition) {
+        recognition.stop();
+    }
+}
+
+function addMessage(sender, message) {
+    const chatMessages = document.getElementById('chat-messages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender.toLowerCase()}`;
+    
+    const senderClass = sender === 'Sensei' ? 'bg-blue-600' : sender === 'You' ? 'bg-green-600' : 'bg-gray-600';
+    
+    messageDiv.innerHTML = `
+        <div class="flex items-start gap-3">
+            <div class="${senderClass} text-white px-3 py-1 rounded-full text-sm font-bold">
+                ${sender}
+            </div>
+            <div class="flex-1 text-white">
+                ${message}
+            </div>
+        </div>
+    `;
+    
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function speakText(text) {
+    if ('speechSynthesis' in window) {
+        // Stop any current speech
+        speechSynthesis.cancel();
+        
+        const utterance = new SpeechSynthesisUtterance(text);
+        
+        // Wait for voices to load
+        const setVoiceAndSpeak = () => {
+            const voices = speechSynthesis.getVoices();
+            console.log('Available voices:', voices.map(v => `${v.name} (${v.lang})`));
+            
+            // Try to find Japanese voice
+            const japaneseVoice = voices.find(voice => 
+                voice.lang.includes('ja') || 
+                voice.lang.includes('JP') ||
+                voice.name.toLowerCase().includes('japanese') ||
+                voice.name.toLowerCase().includes('kyoko') ||
+                voice.name.toLowerCase().includes('otoya')
+            );
+            
+            if (japaneseVoice) {
+                console.log('Using Japanese voice:', japaneseVoice.name);
+                utterance.voice = japaneseVoice;
+            } else {
+                console.log('No Japanese voice found, using default');
+            }
+            
+            utterance.lang = 'ja-JP';
+            utterance.rate = 1;
+            utterance.pitch = 1;
+            utterance.volume = 1;
+            
+            utterance.onstart = () => {
+                console.log('Speech started');
+                document.getElementById('play-response-btn').classList.add('opacity-50');
+            };
+            
+            utterance.onend = () => {
+                console.log('Speech ended');
+                document.getElementById('play-response-btn').classList.remove('opacity-50');
+            };
+            
+            utterance.onerror = (event) => {
+                console.error('Speech error:', event);
+                document.getElementById('play-response-btn').classList.remove('opacity-50');
+                addMessage('System', 'Audio playback error. Please try the Play Response button.');
+            };
+            
+            console.log('Speaking text:', text);
+            speechSynthesis.speak(utterance);
+        };
+        
+        // Check if voices are already loaded
+        if (speechSynthesis.getVoices().length !== 0) {
+            setVoiceAndSpeak();
+        } else {
+            // Wait for voices to load
+            speechSynthesis.addEventListener('voiceschanged', setVoiceAndSpeak, { once: true });
+            
+            // Fallback timeout
+            setTimeout(() => {
+                if (speechSynthesis.getVoices().length === 0) {
+                    console.log('Voices still not loaded, trying anyway...');
+                    setVoiceAndSpeak();
+                }
+            }, 1000);
+        }
+    } else {
+        console.error('Speech synthesis not supported');
+        addMessage('System', 'Text-to-speech not supported in your browser.');
+    }
+}
+
+function testSpeech() {
+    console.log('Testing speech...');
+    addMessage('System', 'Testing audio: こんにちは、これはテストです。');
+    speakText('こんにちは、これはテストです。');
+    
+    // Show debug info
+    const debugInfo = document.getElementById('debug-info');
+    debugInfo.classList.remove('hidden');
+    
+    document.getElementById('browser-info').textContent = navigator.userAgent.split(' ')[0];
+    document.getElementById('speech-support').textContent = 'speechSynthesis' in window ? 'Yes' : 'No';
+    
+    setTimeout(() => {
+        const voices = speechSynthesis.getVoices();
+        document.getElementById('voice-count').textContent = `${voices.length} voices found`;
+        
+        // List Japanese voices
+        const japaneseVoices = voices.filter(voice => 
+            voice.lang.includes('ja') || voice.lang.includes('JP')
+        );
+        
+        if (japaneseVoices.length > 0) {
+            addMessage('System', `Found ${japaneseVoices.length} Japanese voice(s): ${japaneseVoices.map(v => v.name).join(', ')}`);
+        } else {
+            addMessage('System', 'No Japanese voices found. Audio may not work properly.');
+        }
+    }, 500);
+}
+
+function playLastResponse() {
+    if (lastAIResponse) {
+        console.log('Playing last response:', lastAIResponse);
+        speakText(lastAIResponse);
+    } else {
+        addMessage('System', 'No response to play.');
+    }
+}
+
+function updateProgressDisplay(topic, duration) {
+    const progressContent = document.getElementById('progress-content');
+    const minutes = Math.floor(duration / 60);
+    const seconds = duration % 60;
+    
+    progressContent.innerHTML = `
+        <div class="space-y-2">
+            <div class="flex justify-between">
+                <span>Last Topic:</span>
+                <span class="font-bold">${topic.charAt(0).toUpperCase() + topic.slice(1)}</span>
+            </div>
+            <div class="flex justify-between">
+                <span>Duration:</span>
+                <span class="font-bold">${minutes}:${seconds.toString().padStart(2, '0')}</span>
+            </div>
+            <div class="text-green-400 text-center mt-4">
+                ✅ Session completed successfully!
+            </div>
+        </div>
+    `;
+}
+
+// Initialize with 1 minute selected
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelector('.duration-btn').classList.add('ring-4', 'ring-white/50');
+});
+   </script>
+</body>
+</html>
