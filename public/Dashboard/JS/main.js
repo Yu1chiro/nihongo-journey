@@ -1,4 +1,4 @@
-        // Firebase Configuration
+   // Firebase Configuration
 const firebaseConfig = {
   apiKey: "AIzaSyDpyrC1-1xl6pyCLKBd4mZbW93K1F95FJs",
   authDomain: "nihongo-journey.firebaseapp.com",
@@ -380,6 +380,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Handle sign out
 async function handleSignOut() {
+   try {
+        await auth.signOut();
+        // Clear session cookie di server
+        await fetch('/api/auth/signout', { method: 'POST' });
+        // Arahkan ke halaman utama
+        window.location.href = '/';
+    } catch (error) {
+        console.error('Sign-out error:', error);
+    }
+}
+document.addEventListener('DOMContentLoaded', function() {
+    const logoutBtn = document.getElementById('Logout');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', handleLogout);
+    }
+});
+
+// Handle sign out
+async function handleLogout() {
    try {
         await auth.signOut();
         // Clear session cookie di server

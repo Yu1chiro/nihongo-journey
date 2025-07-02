@@ -5,24 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Nihongo Journey - Belajar bahasa Jepang dengan mudah dan menyenangkan. Mulai petualanganmu hari ini!" />
-    <meta name="keywords" content="belajar bahasa Jepang, Nihongo Journey, kursus Jepang, hiragana, katakana, kanji, JLPT" />
-    <meta name="author" content="Nihongo Journey" />
+    <meta name="description" content="Nihongo Kiroku - Belajar bahasa Jepang dengan mudah dan menyenangkan. Mulai petualanganmu hari ini!" />
+    <meta name="keywords" content="belajar bahasa Jepang, Nihongo Kiroku, kursus Jepang, hiragana, katakana, kanji, JLPT" />
+    <meta name="author" content="Nihongo Kiroku" />
     <!-- Open Graph (Facebook, Discord, Line, WhatsApp, LinkedIn) -->
-    <meta property="og:title" content="Nihongo Journey" />
+    <meta property="og:title" content="Nihongo Kiroku" />
     <meta property="og:description" content="Petualangan menyenangkan belajar bahasa Jepang untuk pemula hingga mahir." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://nihongo-journey.vercel.app" />
-    <meta property="og:image" content="https://nihongo-journey.vercel.app/icon.png" />
+    <meta property="og:image" content="https://nihongo-journey.vercel.app/icon" />
     <!-- Gambar thumbnail -->
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Nihongo Journey" />
+    <meta name="twitter:title" content="Nihongo Kiroku" />
     <meta name="twitter:description" content="Petualangan menyenangkan belajar bahasa Jepang untuk pemula hingga mahir." />
-    <meta name="twitter:image" content="https://nihongo-journey.vercel.app/icon.png" />
-    <title>Nihongo Journey | Yuichiro</title>
+    <meta name="twitter:image" content="https://nihongo-journey.vercel.app/icon" />
+    <title>Nihongo Kiroku | Yuichiro</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="shortcut icon" href="icon.png" type="image/x-icon" />
+    <link rel="shortcut icon" href="/icon" type="image/x-icon" />
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <link rel="stylesheet" href="index.css" />
@@ -52,8 +52,8 @@
     <nav class="bg-white py-4 shadow-sm wabi-border">
       <div class="container mx-auto px-4 flex justify-between items-center">
         <div class="flex items-center space-x-3">
-          <i class="fas fa-language text-2xl text-secondary"></i>
-          <span class="text-xl font-medium">Nihongo Journey</span>
+         <img src="/icon" class="h-10 w-10 rounded-lg" alt="">
+          <span class="text-xl font-medium">Nihongo Kiroku</span>
         </div>
       </div>
     </nav>
@@ -62,8 +62,8 @@
     <section class="hero-pattern py-16 md:py-24">
       <div class="container mx-auto px-4 flex flex-col md:flex-row items-center">
         <div class="md:w-1/2 mb-12 md:mb-0">
-          <h1 class="text-3xl md:text-4xl font-medium mb-6 leading-tight">Belajar Bahasa Jepang dengan <span class="text-secondary">Ketenangan</span> dan <span class="text-secondary">Kesederhanaan</span></h1>
-          <p class="text-lg text-gray-600 mb-8">Metode otodidak yang mengutamakan proses alami belajar bahasa. Fokus pada Hiragana & Romaji dengan pendekatan yang tenang dan berkelanjutan.</p>
+          <h1 class="text-3xl md:text-4xl font-medium mb-6 leading-tight">Belajar Bahasa Jepang Lebih Seru Dengan <span class="text-secondary"> Nihongo Kiroku </span></h1>
+          <p class="text-lg text-gray-600 mb-8">Platform pembelajaran bahasa jepang beginner friendly dengan Gemini</p>
           <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
             <a href="#features" class="bg-secondary hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium text-center transition duration-300 shadow-sm"> Lihat Fitur </a>
             <a href="#signInBtn" class="bg-green-500 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium text-center transition duration-300 shadow-sm"> Mulai Belajar </a>
@@ -76,81 +76,103 @@
         </div>
       </div>
     </section>
-
-    <!-- Features Section -->
-    <section id="features" class="py-16 bg-white">
-      <div class="container mx-auto px-4">
-        <div class="text-center mb-12">
-          <h2 class="text-2xl font-medium mb-3">Fitur yang Menenangkan</h2>
-          <div class="w-20 h-1 bg-secondary mx-auto mb-6"></div>
-          <p class="text-gray-600 max-w-2xl mx-auto">Setiap fitur dirancang untuk mengurangi kecemasan dan meningkatkan fokus pada pembelajaran.</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          <!-- Feature 1 -->
-          <div class="feature-card p-6 rounded-lg">
-            <div class="w-10 h-10 bg-primary bg-opacity-20 rounded-full flex items-center justify-center mb-4">
-              <i class="fas fa-layer-group text-secondary text-lg"></i>
-            </div>
-            <h3 class="text-lg font-medium mb-3">Modul Terstruktur</h3>
-            <p class="text-gray-600 text-sm">Pembelajaran bertahap yang mengalir seperti sungai. Setiap modul saling terhubung dengan alami.</p>
-          </div>
-
-          <!-- Feature 2 -->
-          <div class="feature-card p-6 rounded-lg">
-            <div class="w-10 h-10 bg-primary bg-opacity-20 rounded-full flex items-center justify-center mb-4">
-              <i class="fas fa-robot text-secondary text-lg"></i>
-            </div>
-            <h3 class="text-lg font-medium mb-3">Materi by Gemini</h3>
-            <p class="text-gray-600 text-sm">Konten yang beradaptasi dengan ritme belajar Anda, seperti teh yang diseduh sesuai suhu yang tepat.</p>
-          </div>
-
-          <!-- Feature 3 -->
-          <div class="feature-card p-6 rounded-lg">
-            <div class="w-10 h-10 bg-primary bg-opacity-20 rounded-full flex items-center justify-center mb-4">
-              <i class="fas fa-mobile-alt text-secondary text-lg"></i>
-            </div>
-            <h3 class="text-lg font-medium mb-3">Mobile Friendly</h3>
-            <p class="text-gray-600 text-sm">Belajar di mana saja, kapan saja. Seperti taman zen yang selalu bisa Anda kunjungi.</p>
-          </div>
-
-          <!-- Feature 4 -->
-          <div class="feature-card p-6 rounded-lg">
-            <div class="w-10 h-10 bg-primary bg-opacity-20 rounded-full flex items-center justify-center mb-4">
-              <i class="fas fa-chart-line text-secondary text-lg"></i>
-            </div>
-            <h3 class="text-lg font-medium mb-3">Progress Tracking</h3>
-            <p class="text-gray-600 text-sm">Pantau perkembangan tanpa tekanan. Seperti melihat pohon tumbuh perlahan.</p>
-          </div>
-
-          <!-- Feature 5 -->
-          <div class="feature-card p-6 rounded-lg">
-            <div class="w-10 h-10 bg-primary bg-opacity-20 rounded-full flex items-center justify-center mb-4">
-              <i class="fas fa-question-circle text-secondary text-lg"></i>
-            </div>
-            <h3 class="text-lg font-medium mb-3">Quiz Interaktif</h3>
-            <p class="text-gray-600 text-sm">Latihan yang menyenangkan, seperti permainan tradisional Jepang.</p>
-          </div>
-
-          <!-- Feature 6 -->
-          <div class="feature-card p-6 rounded-lg">
-            <div class="w-10 h-10 bg-primary bg-opacity-20 rounded-full flex items-center justify-center mb-4">
-              <i class="fas fa-font text-secondary text-lg"></i>
-            </div>
-            <h3 class="text-lg font-medium mb-3">Hiragana & Romaji Only</h3>
-            <p class="text-gray-600 text-sm">Fokus pada dasar-dasar yang indah, sebelum melangkah lebih jauh.</p>
-          </div>
-        </div>
+      <section id="about" class="py-16 bg-paper">
+  <div class="container mx-auto px-4">
+    <div class="max-w-4xl mx-auto text-center">
+      <h2 class="text-3xl font-medium mb-6 text-accent">Tentang Nihongo Kiroku</h2>
+      <div class="w-20 h-1 bg-secondary mx-auto mb-8 rounded-full"></div>
+      
+      <div class="space-y-6 text-justify p-3">
+        <p class="text-gray-700 text-lg leading-relaxed">
+          Nihongo Kiroku adalah sebuah platform pembelajaran bahasa Jepang yang dirancang secara terstruktur dan berbasis roadmap, khusus ditujukan bagi pemula yang ingin memulai perjalanan belajar dari dasar. Melalui pendekatan bertahap, pengguna akan dipandu memahami berbagai materi penting seperti perkenalan diri, pembahasan tentang hobi, keluarga, hingga percakapan sehari-hari dalam bahasa Jepang. Terinspirasi dari pendekatan eksperimental ala Google Labs, dipadukan dengan pengalaman pribadi saya sebagai pembelajar bahasa Jepang yang sempat mengalami kebingungan dalam menentukan arah belajar yang tepat. Berangkat dari keinginan sederhana untuk memahami bahasa Jepang secara praktis dan komunikatif, serta pengalaman mengajar selama dua tahun di tingkat JLPT N5 hingga N4 ditambah pemahaman mendalam terhadap isi buku Minna no Nihongo 1 dan 2. Saya merasa terdorong untuk menciptakan sebuah ruang belajar yang tidak hanya informatif, tetapi juga personal dan progresif.
+        </p>
+        
+        <p class="text-gray-700 text-lg leading-relaxed">
+          Nama Nihongo Kiroku（日本語記録） dipilih karena secara semantik mengandung makna yang merepresentasikan inti dari platform ini. "Nihongo" berarti bahasa Jepang, sementara "Kiroku" berarti catatan atau dokumentasi. Secara harfiah, nama ini mencerminkan gagasan bahwa proses belajar adalah sesuatu yang perlu dicatat, ditata, dan dilacak perkembangannya. Dari sisi makna semiotik, nama ini menjadi simbol dari perjalanan intelektual dan pencapaian personal setiap pengguna, setiap langkah kecil dalam memahami bahasa Jepang adalah bagian dari sebuah kisah belajar yang bernilai. Dengan demikian, Nihongo Kiroku bukan hanya sekadar media belajar, tetapi juga ruang reflektif yang memungkinkan pengguna merekam jejak proses belajarnya sendiri, selangkah demi selangkah.
+        </p>
       </div>
-    </section>
+      
+      <div class="mt-10 flex justify-center gap-4">
+       <p class="text-gray-700 text-xs">Yuichiro | 2025</p>
+        
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="features" class="py-16 bg-paper">
+  <div class="container mx-auto px-4">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl font-medium mb-3 text-accent">Fitur yang Menenangkan</h2>
+      <div class="w-20 h-1 bg-secondary mx-auto mb-6 rounded-full"></div>
+      <p class="text-gray-600 max-w-2xl mx-auto text-lg">Setiap fitur dirancang untuk mengurangi kecemasan dan meningkatkan fokus pada pembelajaran.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+      <!-- Feature 1 - Roadmap Terstruktur -->
+      <div class="feature-card p-8 rounded-xl bg-white shadow-sm hover:shadow-md transition-shadow duration-300 border border-natural">
+        <div class="w-12 h-12 bg-primary bg-opacity-20 rounded-full flex items-center justify-center mb-5 mx-auto">
+          <i class="fas fa-map-marked-alt text-secondary text-xl"></i>
+        </div>
+        <h3 class="text-xl font-medium mb-3 text-center text-accent">Roadmap Terstruktur</h3>
+        <p class="text-gray-600 text-center">Panduan belajar bertahap yang jelas dan terstruktur.</p>
+      </div>
+
+      <!-- Feature 2 - Gemini Integration -->
+      <div class="feature-card p-8 rounded-xl bg-white shadow-sm hover:shadow-md transition-shadow duration-300 border border-natural transform hover:scale-[1.02] transition-transform">
+        <div class="w-12 h-12 bg-primary bg-opacity-20 rounded-full flex items-center justify-center mb-5 mx-auto">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6 text-secondary">
+            <path fill="currentColor" d="M12 2a10 10 0 0 0-10 10a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2m0 2a8 8 0 0 1 8 8a8 8 0 0 1-8 8a8 8 0 0 1-8-8a8 8 0 0 1 8-8m-5 6l5 5l5-5H7z"/>
+          </svg>
+        </div>
+        <h3 class="text-xl font-medium mb-3 text-center text-accent">Materi by Gemini</h3>
+        <p class="text-gray-600 text-center">Konten cerdas yang beradaptasi dengan gaya belajar Anda, seperti teh yang diseduh sempurna untuk selera Anda.</p>
+      </div>
+
+      <!-- Feature 3 - Progress Tracking -->
+      <div class="feature-card p-8 rounded-xl bg-white shadow-sm hover:shadow-md transition-shadow duration-300 border border-natural">
+        <div class="w-12 h-12 bg-primary bg-opacity-20 rounded-full flex items-center justify-center mb-5 mx-auto">
+          <i class="fas fa-chart-line text-secondary text-xl"></i>
+        </div>
+        <h3 class="text-xl font-medium mb-3 text-center text-accent">Progress Tracking</h3>
+        <p class="text-gray-600 text-center">Menyajikan progress pembelajaranmu di setiap proses</p>
+      </div>
+
+      <!-- Feature 4 - Flashcards -->
+      <div class="feature-card p-8 rounded-xl bg-white shadow-sm hover:shadow-md transition-shadow duration-300 border border-natural">
+        <div class="w-12 h-12 bg-primary bg-opacity-20 rounded-full flex items-center justify-center mb-5 mx-auto">
+          <i class="fas fa-layer-group text-secondary text-xl"></i>
+        </div>
+        <h3 class="text-xl font-medium mb-3 text-center text-accent">Flashcards</h3>
+        <p class="text-gray-600 text-center">Hiragana, Katakana, dan Kanji disajikan dalam kartu interaktif yang mudah diingat.</p>
+      </div>
+
+      <!-- Feature 5 - Quiz Interaktif -->
+      <div class="feature-card p-8 rounded-xl bg-white shadow-sm hover:shadow-md transition-shadow duration-300 border border-natural">
+        <div class="w-12 h-12 bg-primary bg-opacity-20 rounded-full flex items-center justify-center mb-5 mx-auto">
+          <i class="fas fa-question-circle text-secondary text-xl"></i>
+        </div>
+        <h3 class="text-xl font-medium mb-3 text-center text-accent">Quiz Interaktif</h3>
+        <p class="text-gray-600 text-center">Latihan menyenangkan dengan umpan balik instan, seperti permainan tradisional Jepang.</p>
+      </div>
+
+      <!-- Feature 6 - Training Conversation -->
+      <div class="feature-card p-8 rounded-xl bg-white shadow-sm hover:shadow-md transition-shadow duration-300 border border-natural">
+        <div class="w-12 h-12 bg-primary bg-opacity-20 rounded-full flex items-center justify-center mb-5 mx-auto">
+          <i class="fas fa-comments text-secondary text-xl"></i>
+        </div>
+        <h3 class="text-xl font-medium mb-3 text-center text-accent">Training Conversation</h3>
+        <p class="text-gray-600 text-center">Praktik percakapan sehari-hari dengan skenario realistis dengan gemini.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
     <!-- CTA Section -->
     <section class="py-16 natural-bg">
       <div class="container mx-auto px-4 text-center">
         <div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-sm wabi-border">
-          <h2 class="text-2xl font-medium mb-4">Siap Memulai Perjalanan Bahasa Jepang Anda?</h2>
-          <p class="text-gray-600 mb-6">Bergabunglah dengan komunitas pembelajar yang menghargai proses dan perkembangan alami.</p>
-
+          <h2 class="text-2xl font-medium mb-4">Siap Memulai Pembelajaran?</h2>
           <button id="signInBtn" class="bg-white border border-gray-300 rounded-lg px-6 py-3 text-gray-700 font-medium hover:bg-gray-50 transition-colors duration-200 shadow-md hover:shadow-lg flex items-center mx-auto">
             <svg class="w-5 h-5 mr-3" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -161,7 +183,7 @@
             Masuk dengan Google
           </button>
 
-          <p class="mt-4 text-gray-500 text-sm">Tidak memerlukan informasi kartu kredit. Mulai belajar dalam hitungan detik.</p>
+          <p class="mt-4 text-gray-500 text-sm">Platform disusun oleh tutor berpengalaman yg memiliki spesialiasi dalam mengajar bahasa jepang tingkat level N5-N4</p>
         </div>
       </div>
     </section>
@@ -180,7 +202,7 @@
             <i class="fab fa-youtube"></i>
           </a>
         </div>
-        <p class="text-gray-300 text-sm">&copy; Nihonggo Journey <span id="currentYear"></span>. Semua hak dilindungi.</p>
+        <p class="text-gray-300 text-sm">&copy; Yuichiro | <span id="currentYear"></span>2025</p>
       </div>
     </footer>
     <!-- Firebase Configuration -->

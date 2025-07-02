@@ -1,491 +1,528 @@
 <!DOCTYPE html>
 <html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Belajar Kanji - Nihongo Journey</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-auth-compat.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-database-compat.min.js"></script>
     <style>
-        .flip-card { perspective: 500px; }
-        .flip-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.8s; transform-style: preserve-3d; }
-        .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
-        .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 1rem; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-        .flip-card-back { transform: rotateY(180deg); }
-        .kanji-char { font-size: 8rem; font-weight: bold; line-height: 1; }
-        .kanji-reading { font-size: 1.75rem; }
-        .kanji-meaning { font-size: 2rem; font-weight: 500; }
-        .progress-bar { transition: width 0.3s ease; }
+      .flip-card {
+        perspective: 500px;
+      }
+      .flip-card-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transition: transform 0.8s;
+        transform-style: preserve-3d;
+      }
+      .flip-card.flipped .flip-card-inner {
+        transform: rotateY(180deg);
+      }
+      .flip-card-front,
+      .flip-card-back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        border-radius: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+      }
+      .flip-card-back {
+        transform: rotateY(180deg);
+      }
+      .kanji-char {
+        font-size: 8rem;
+        font-weight: bold;
+        line-height: 1;
+      }
+      .kanji-reading {
+        font-size: 1.75rem;
+      }
+      .kanji-meaning {
+        font-size: 2rem;
+        font-weight: 500;
+      }
+      .progress-bar {
+        transition: width 0.3s ease;
+      }
     </style>
-</head>
-<body class="bg-gradient-to-br from-blue-900 via-navy-800 to-blue-900 min-h-screen text-white">
-     <div class="bg-white shadow-sm border-b sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  </head>
+  <body class="bg-gradient-to-br from-blue-900 via-navy-800 to-blue-900 min-h-screen text-white">
+    <div class="bg-white shadow-sm border-b sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center py-4">
-            <!-- Logo/Brand -->
-            <h1 class="text-lg font-bold text-gray-900">Dashboard</h1>
-            
-            <!-- Desktop Navigation -->
-            <nav class="hidden md:flex items-center space-x-8">
-                <a href="/Dashboard/user" class="text-gray-600 hover:text-gray-900 transition-colors">Dashboard</a>
-                <a href="/Dashboard/roadmap" class="text-gray-600 hover:text-gray-900 transition-colors">Roadmap</a>
-                <a href="/Dashboard/flashcards" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Flashcards</a>
-                <a href="/Dashboard/kanji" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Kanji</a>
+          <!-- Logo/Brand -->
+          <h1 class="text-lg font-bold text-gray-900">Dashboard</h1>
 
-               
-            </nav>
-            
-            <!-- Mobile Menu Button -->
-            <div class="md:hidden flex items-center">
-                <div id="userInfoMobile" class="hidden flex items-center mr-4">
-                    <span id="userNameMobile" class="text-sm text-gray-600 truncate max-w-xs"></span>
-                </div>
-                <button id="mobile-menu-button" class="text-gray-500 hover:text-gray-900 focus:outline-none">
-                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                </button>
+          <!-- Desktop Navigation -->
+          <nav class="hidden md:flex items-center space-x-8">
+            <a href="/Dashboard/user" class="text-gray-600 hover:text-gray-900 transition-colors">Dashboard</a>
+            <a href="/Dashboard/roadmap" class="text-gray-600 hover:text-gray-900 transition-colors">Roadmap</a>
+            <a href="/Dashboard/flashcards" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Flashcards</a>
+            <a href="/Dashboard/kanji" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Kanji</a>
+          </nav>
+
+          <!-- Mobile Menu Button -->
+          <div class="md:hidden flex items-center">
+            <div id="userInfoMobile" class="hidden flex items-center mr-4">
+              <span id="userNameMobile" class="text-sm text-gray-600 truncate max-w-xs"></span>
             </div>
+            <button id="mobile-menu-button" class="text-gray-500 hover:text-gray-900 focus:outline-none">
+              <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
         </div>
-    </div>
-    
-    <!-- Mobile Menu (Hidden by default) -->
-    <div id="mobile-menu" class="fixed inset-0 z-40 hidden">
+      </div>
+
+      <!-- Mobile Menu (Hidden by default) -->
+      <div id="mobile-menu" class="fixed inset-0 z-40 hidden">
         <!-- Overlay -->
         <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" id="mobile-menu-overlay"></div>
-        
+
         <!-- Menu Container (Slides from right) -->
         <div class="fixed inset-y-0 right-0 max-w-xs w-full bg-white shadow-xl transform transition-transform duration-300 ease-in-out translate-x-full">
-            <div class="flex flex-col h-full">
-                <!-- Menu Header -->
-                <div class="flex justify-between items-center px-4 py-4 border-b">
-                   <img id="userPhoto" class="w-8 h-8 rounded-full" alt="User Photo">
-                   <h2 id="userName" class="flex text-gray-700"></h2>
-                    <button id="mobile-menu-close" class="text-gray-500 hover:text-gray-900">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-                
-                <!-- Menu Items -->
-                <div class="flex-1 overflow-y-auto px-4 py-6 space-y-4">
-                <a href="/Dashboard/user" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
-                <a href="/Dashboard/roadmap" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Roadmap</a>
-                <a href="/Dashboard/flashcards" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Flashcards</a>
-                <a href="/Dashboard/kanji" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Kanji</a>
-
-                </div>
-                
-                <!-- Footer with Sign Out -->
-                <div class="px-4 py-4 border-t">
-                    
-                       
-                </div>
+          <div class="flex flex-col h-full">
+            <!-- Menu Header -->
+            <div class="flex justify-between items-center px-4 py-4 border-b">
+              <img id="userPhoto" class="w-8 h-8 rounded-full" alt="User Photo" />
+              <h2 id="userName" class="flex text-gray-700"></h2>
+              <button id="mobile-menu-close" class="text-gray-500 hover:text-gray-900">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
+
+            <!-- Menu Items -->
+            <div class="flex-1 overflow-y-auto px-4 py-6 space-y-4">
+              <a href="/Dashboard/user" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
+              <a href="/Dashboard/roadmap" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Roadmap</a>
+              <a href="/Dashboard/flashcards" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Flashcards</a>
+              <a href="/Dashboard/kanji" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Kanji</a>
+            </div>
+
+            <!-- Footer with Sign Out -->
+            <div class="px-4 py-4 border-t"></div>
+          </div>
         </div>
-    </div>
-    <!-- script -->
+      </div>
+      <!-- script -->
       <script>
-    // Mobile menu functionality
-    const mobileMenuButton = document.getElementById('mobile-menu-button');
-    const mobileMenuClose = document.getElementById('mobile-menu-close');
-    const mobileMenu = document.getElementById('mobile-menu');
-    const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
-    const mobileMenuContainer = mobileMenu.querySelector('.max-w-xs');
+        // Mobile menu functionality
+        const mobileMenuButton = document.getElementById("mobile-menu-button");
+        const mobileMenuClose = document.getElementById("mobile-menu-close");
+        const mobileMenu = document.getElementById("mobile-menu");
+        const mobileMenuOverlay = document.getElementById("mobile-menu-overlay");
+        const mobileMenuContainer = mobileMenu.querySelector(".max-w-xs");
 
-    function openMobileMenu() {
-        mobileMenu.classList.remove('hidden');
-        setTimeout(() => {
-            mobileMenuOverlay.classList.remove('opacity-0');
-            mobileMenuContainer.classList.remove('translate-x-full');
-        }, 20);
-    }
-
-    function closeMobileMenu() {
-        mobileMenuOverlay.classList.add('opacity-0');
-        mobileMenuContainer.classList.add('translate-x-full');
-        setTimeout(() => {
-            mobileMenu.classList.add('hidden');
-        }, 300);
-    }
-
-    mobileMenuButton.addEventListener('click', openMobileMenu);
-    mobileMenuClose.addEventListener('click', closeMobileMenu);
-    mobileMenuOverlay.addEventListener('click', closeMobileMenu);
-
-    // Close menu when clicking outside
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && !mobileMenu.classList.contains('hidden')) {
-            closeMobileMenu();
+        function openMobileMenu() {
+          mobileMenu.classList.remove("hidden");
+          setTimeout(() => {
+            mobileMenuOverlay.classList.remove("opacity-0");
+            mobileMenuContainer.classList.remove("translate-x-full");
+          }, 20);
         }
-    });
-    </script>
-</div>
+
+        function closeMobileMenu() {
+          mobileMenuOverlay.classList.add("opacity-0");
+          mobileMenuContainer.classList.add("translate-x-full");
+          setTimeout(() => {
+            mobileMenu.classList.add("hidden");
+          }, 300);
+        }
+
+        mobileMenuButton.addEventListener("click", openMobileMenu);
+        mobileMenuClose.addEventListener("click", closeMobileMenu);
+        mobileMenuOverlay.addEventListener("click", closeMobileMenu);
+
+        // Close menu when clicking outside
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && !mobileMenu.classList.contains("hidden")) {
+            closeMobileMenu();
+          }
+        });
+      </script>
+    </div>
     <!-- Loading Screen -->
     <div id="loadingScreen" class="fixed inset-0 bg-navy-900 bg-opacity-90 flex items-center justify-center z-50">
-        <div class="text-center"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-300 mx-auto mb-4"></div><p class="text-lg">Memuat...</p></div>
+      <div class="text-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-300 mx-auto mb-4"></div>
+        <p class="text-lg">Memuat...</p>
+      </div>
     </div>
 
     <div class="container mx-auto px-4 py-8">
-        <!-- Welcome Screen -->
-        <div id="welcomeScreen" class="max-w-2xl mx-auto text-center">
-            <h1 class="text-5xl font-bold mb-4 text-blue-100">KANJI</h1>
-            <p class="text-blue-200 text-lg mb-8">Hafalkan bentuk, cara baca, dan arti Kanji dasar.</p>
-            <div class="bg-blue-800 bg-opacity-30 backdrop-blur-lg rounded-2xl p-8 shadow-xl border border-blue-700">
-                <h2 class="text-2xl font-bold text-blue-100 mb-4">Progress Anda</h2>
-                <div class="bg-blue-700 bg-opacity-30 rounded-lg p-4 mb-6 border border-blue-600">
-                    <p class="text-blue-200 text-sm mb-1">Level Kanji Saat Ini:</p>
-                    <p class="text-3xl font-bold text-white" id="kanjiLevel">1</p>
-                    <p class="text-blue-200 text-sm mt-2">Skor Rata-rata: <span id="kanjiScore">0</span>%</p>
-                </div>
-                <button onclick="startFlashcards()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg">
-                    Mulai Belajar
-                </button>
-            </div>
+      <!-- Welcome Screen -->
+      <div id="welcomeScreen" class="max-w-2xl mx-auto text-center">
+        <h1 class="text-5xl font-bold mb-4 text-blue-100">KANJI</h1>
+        <p class="text-blue-200 text-lg mb-8">Hafalkan bentuk, cara baca, dan arti Kanji dasar.</p>
+        <div class="bg-blue-800 bg-opacity-30 backdrop-blur-lg rounded-2xl p-8 shadow-xl border border-blue-700">
+          <h2 class="text-2xl font-bold text-blue-100 mb-4">Progress Anda</h2>
+          <div class="bg-blue-700 bg-opacity-30 rounded-lg p-4 mb-6 border border-blue-600">
+            <p class="text-blue-200 text-sm mb-1">Level Kanji Saat Ini:</p>
+            <p class="text-3xl font-bold text-white" id="kanjiLevel">1</p>
+            <p class="text-blue-200 text-sm mt-2">Skor Rata-rata: <span id="kanjiScore">0</span>%</p>
+          </div>
+          <button onclick="startFlashcards()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg">Mulai Belajar</button>
         </div>
+      </div>
 
-        <!-- Flashcards Screen -->
-        <div id="flashcardsScreen" class="hidden max-w-2xl mx-auto">
-            <div class="mb-6">
-                <div class="flex justify-between text-sm mb-2 text-blue-200">
-                    <span id="progressText"></span>
-                    <span id="typeLevel"></span>
-                </div>
-                <div class="w-full bg-blue-800 rounded-full h-2">
-                    <div id="progressBar" class="progress-bar bg-gradient-to-r from-blue-400 to-teal-400 h-2 rounded-full"></div>
-                </div>
-            </div>
-            <div class="flip-card mx-auto max-w-md h-80 mb-6" id="flashcard" onclick="this.classList.toggle('flipped')">
-                <div class="flip-card-inner">
-                    <div class="flip-card-front bg-gradient-to-r from-blue-700 to-indigo-600 shadow-2xl border border-blue-700">
-                        <div class="kanji-char text-blue-100" id="kanjiCharacter">kanji</div>
-                    </div>
-                    <div class="flip-card-back bg-gradient-to-r from-blue-800 to-indigo-900 shadow-2xl p-6 border border-blue-600">
-                        <div class="text-center">
-                            <div id="kanjiReadings" class="mb-4">
-                                <p class="text-blue-200 text-sm">Onyomi</p>
-                                <p class="kanji-reading text-blue-100 text-sm" id="kanjiOnyomi"></p>
-                                <p class="text-blue-200 text-sm mt-2">Kunyomi</p>
-                                <p class="kanji-reading text-blue-100 text-sm" id="kanjiKunyomi"></p>
-                                <p class="text-blue-200 text-sm mt-2">Romaji</p>
-                                <p class="kanji-reading text-blue-100 text-sm" id="kanjiFurigana"></p>
-                            </div>
-                            <hr class="border-blue-500 my-4 opacity-50">
-                            <p class="text-blue-200 text-sm">Arti</p>
-                            <p class="kanji-meaning text-white" id="kanjiMeaning"></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="text-center">
-                <p class="text-blue-300 mb-4">Klik kartu untuk melihat jawaban</p>
-                <div class="flex gap-4 justify-center">
-                    <button onclick="previousCard()" id="prevBtn" class="bg-blue-800 hover:bg-blue-700 font-bold py-2 px-6 rounded-lg transition-colors duration-200 disabled:opacity-50 border border-blue-700">
-                        ←
-                    </button>
-                    <button onclick="nextCard()" id="nextBtn" class="bg-blue-600 hover:bg-blue-500 font-bold py-2 px-6 rounded-lg transition-colors duration-200 shadow-md border border-blue-500">
-                        →
-                    </button>
-                </div>
-            </div>
+      <!-- Flashcards Screen -->
+      <div id="flashcardsScreen" class="hidden max-w-2xl mx-auto">
+        <div class="mb-6">
+          <div class="flex justify-between text-sm mb-2 text-blue-200">
+            <span id="progressText"></span>
+            <span id="typeLevel"></span>
+          </div>
+          <div class="w-full bg-blue-800 rounded-full h-2">
+            <div id="progressBar" class="progress-bar bg-gradient-to-r from-blue-400 to-teal-400 h-2 rounded-full"></div>
+          </div>
         </div>
+        <div class="flip-card mx-auto max-w-md h-80 mb-6" id="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="flip-card-inner">
+            <div class="flip-card-front bg-gradient-to-r from-blue-700 to-indigo-600 shadow-2xl border border-blue-700">
+              <div class="kanji-char text-blue-100" id="kanjiCharacter">kanji</div>
+            </div>
+            <div class="flip-card-back bg-gradient-to-r from-blue-800 to-indigo-900 shadow-2xl p-6 border border-blue-600">
+              <div class="text-center">
+                <div id="kanjiReadings" class="mb-4">
+                  <p class="text-blue-200 text-sm">Onyomi</p>
+                  <p class="kanji-reading text-blue-100 text-sm" id="kanjiOnyomi"></p>
+                  <p class="text-blue-200 text-sm mt-2">Kunyomi</p>
+                  <p class="kanji-reading text-blue-100 text-sm" id="kanjiKunyomi"></p>
+                  <p class="text-blue-200 text-sm mt-2">Romaji</p>
+                  <p class="kanji-reading text-blue-100 text-sm" id="kanjiFurigana"></p>
+                </div>
+                <hr class="border-blue-500 my-4 opacity-50" />
+                <p class="text-blue-200 text-sm">Arti</p>
+                <p class="kanji-meaning text-white" id="kanjiMeaning"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="text-center">
+          <p class="text-blue-300 mb-4">Klik kartu untuk melihat jawaban</p>
+          <div class="flex gap-4 justify-center">
+            <button onclick="previousCard()" id="prevBtn" class="bg-blue-800 hover:bg-blue-700 font-bold py-2 px-6 rounded-lg transition-colors duration-200 disabled:opacity-50 border border-blue-700">←</button>
+            <button onclick="nextCard()" id="nextBtn" class="bg-blue-600 hover:bg-blue-500 font-bold py-2 px-6 rounded-lg transition-colors duration-200 shadow-md border border-blue-500">→</button>
+          </div>
+        </div>
+      </div>
 
-        <!-- Quiz Screen -->
-        <div id="quizScreen" class="hidden max-w-2xl mx-auto">
-            <div class="bg-blue-800 bg-opacity-30 backdrop-blur-lg rounded-2xl p-8 shadow-xl border border-blue-700">
-                <div class="text-center mb-6">
-                    <h2 class="text-2xl font-bold text-blue-100 mb-2">🧠 Kuis Kanji!</h2>
-                </div>
-                <div class="mb-6">
-                    <div class="flex justify-between text-sm mb-2 text-blue-200">
-                        <span id="quizProgressText"></span>
-                        <span id="quizScoreText"></span>
-                    </div>
-                    <div class="w-full bg-blue-800 rounded-full h-2">
-                        <div id="quizProgressBar" class="progress-bar bg-gradient-to-r from-blue-400 to-teal-400 h-2 rounded-full"></div>
-                    </div>
-                </div>
-                <div class="mb-6">
-                    <h3 class="text-xl font-bold mb-4 text-center text-white" id="questionText"></h3>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6" id="optionsContainer"></div>
-                <div class="text-center">
-                    <button id="nextQuestionBtn" class="hidden bg-blue-600 hover:bg-blue-500 font-bold py-3 px-8 rounded-lg shadow-md">
-                        Lanjut
-                    </button>
-                </div>
+      <!-- Quiz Screen -->
+      <div id="quizScreen" class="hidden max-w-2xl mx-auto">
+        <div class="bg-blue-800 bg-opacity-30 backdrop-blur-lg rounded-2xl p-8 shadow-xl border border-blue-700">
+          <div class="text-center mb-6">
+            <h2 class="text-2xl font-bold text-blue-100 mb-2">🧠 Kuis Kanji!</h2>
+          </div>
+          <div class="mb-6">
+            <div class="flex justify-between text-sm mb-2 text-blue-200">
+              <span id="quizProgressText"></span>
+              <span id="quizScoreText"></span>
             </div>
+            <div class="w-full bg-blue-800 rounded-full h-2">
+              <div id="quizProgressBar" class="progress-bar bg-gradient-to-r from-blue-400 to-teal-400 h-2 rounded-full"></div>
+            </div>
+          </div>
+          <div class="mb-6">
+            <h3 class="text-xl font-bold mb-4 text-center text-white" id="questionText"></h3>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6" id="optionsContainer"></div>
+          <div class="text-center">
+            <button id="nextQuestionBtn" class="hidden bg-blue-600 hover:bg-blue-500 font-bold py-3 px-8 rounded-lg shadow-md">Lanjut</button>
+          </div>
         </div>
+      </div>
 
-        <!-- Quiz Result Modal -->
-        <div id="quizModal" class="fixed inset-0 bg-navy-900 bg-opacity-90 hidden flex items-center justify-center z-50">
-            <div class="bg-gradient-to-b from-blue-800 to-navy-800 rounded-2xl p-8 max-w-md w-full mx-4 text-white transform transition-all duration-300 scale-95 border border-blue-600 shadow-2xl" id="modalContent">
-                <div class="text-center">
-                    <div class="text-6xl mb-4" id="resultEmoji"></div>
-                    <h3 class="text-2xl font-bold mb-2" id="resultTitle"></h3>
-                    <p class="text-blue-200 mb-4" id="resultMessage"></p>
-                    <div class="text-3xl font-bold text-blue-300 mb-6" id="resultPercentage"></div>
-                    <div class="flex gap-4">
-                        <button id="continueBtn" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-4 rounded-lg border border-blue-500">
-                            Lanjut Belajar
-                        </button>
-                        <button onclick="backToWelcome()" class="flex-1 bg-blue-800 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg border border-blue-700">
-                            Kembali
-                        </button>
-                    </div>
-                </div>
+      <!-- Quiz Result Modal -->
+      <div id="quizModal" class="fixed inset-0 bg-navy-900 bg-opacity-90 hidden flex items-center justify-center z-50">
+        <div class="bg-gradient-to-b from-blue-800 to-navy-800 rounded-2xl p-8 max-w-md w-full mx-4 text-white transform transition-all duration-300 scale-95 border border-blue-600 shadow-2xl" id="modalContent">
+          <div class="text-center">
+            <div class="text-6xl mb-4" id="resultEmoji"></div>
+            <h3 class="text-2xl font-bold mb-2" id="resultTitle"></h3>
+            <p class="text-blue-200 mb-4" id="resultMessage"></p>
+            <div class="text-3xl font-bold text-blue-300 mb-6" id="resultPercentage"></div>
+            <div class="flex gap-4">
+              <button id="continueBtn" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-4 rounded-lg border border-blue-500">Lanjut Belajar</button>
+              <button onclick="backToWelcome()" class="flex-1 bg-blue-800 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg border border-blue-700">Kembali</button>
             </div>
+          </div>
         </div>
+      </div>
     </div>
 
     <script>
-        // --- GLOBAL VARIABLES & CONFIG ---
-        const currentType = 'kanji'; // Tipe halaman ini adalah 'kanji'
-        let currentLevel = 1;
-        let flashcards = [];
-        let currentCardIndex = 0;
-        let quiz = null;
-        let currentQuestionIndex = 0;
-        let quizScore = 0;
-        let selectedAnswer = null;
+      // --- GLOBAL VARIABLES & CONFIG ---
+      const currentType = "kanji"; // Tipe halaman ini adalah 'kanji'
+      let currentLevel = 1;
+      let flashcards = [];
+      let currentCardIndex = 0;
+      let quiz = null;
+      let currentQuestionIndex = 0;
+      let quizScore = 0;
+      let selectedAnswer = null;
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDpyrC1-1xl6pyCLKBd4mZbW93K1F95FJs",
-            authDomain: "nihongo-journey.firebaseapp.com",
-            projectId: "nihongo-journey",
-            storageBucket: "nihongo-journey.appspot.com",
-            messagingSenderId: "966989016758",
-            appId: "1:966989016758:web:25d43be34bbc1a1342c017",
-            measurementId: "G-2J392RPFMR"
-        };
-        
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const database = firebase.database();
-        
-        // --- INITIALIZATION ---
-        document.addEventListener('DOMContentLoaded', () => {
-            auth.onAuthStateChanged(user => {
-                if(user) {
-                    loadProgress();
-                } else {
-                    console.log("Pengguna belum login.");
-                    // window.location.href = '/'; // Arahkan jika perlu
-                }
-                hideLoading();
-            });
+      const firebaseConfig = {
+        apiKey: "AIzaSyDpyrC1-1xl6pyCLKBd4mZbW93K1F95FJs",
+        authDomain: "nihongo-journey.firebaseapp.com",
+        projectId: "nihongo-journey",
+        storageBucket: "nihongo-journey.appspot.com",
+        messagingSenderId: "966989016758",
+        appId: "1:966989016758:web:25d43be34bbc1a1342c017",
+        measurementId: "G-2J392RPFMR",
+      };
+
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+      const database = firebase.database();
+
+      // --- INITIALIZATION ---
+      document.addEventListener("DOMContentLoaded", () => {
+        auth.onAuthStateChanged((user) => {
+          if (user) {
+            loadProgress();
+          } else {
+            console.log("Pengguna belum login.");
+            // window.location.href = '/'; // Arahkan jika perlu
+          }
+          hideLoading();
+        });
+      });
+
+      function hideLoading() {
+        document.getElementById("loadingScreen").classList.add("hidden");
+      }
+      function showLoading() {
+        document.getElementById("loadingScreen").classList.remove("hidden");
+      }
+
+      // --- PROGRESS & DATA FETCHING ---
+      async function loadProgress() {
+        try {
+          const response = await fetch(`/api/progress/${currentType}`, { credentials: "include" });
+          const data = await response.json();
+          if (data.success) {
+            document.getElementById("kanjiLevel").textContent = data.progress.currentLevel || 1;
+            document.getElementById("kanjiScore").textContent = data.progress.averageScore || 0;
+          }
+        } catch (error) {
+          console.error("Error loading progress:", error);
+        }
+      }
+
+      async function startFlashcards(newLevel = null) {
+        showLoading();
+        try {
+          if (newLevel !== null) {
+            currentLevel = newLevel;
+          } else {
+            const progressRes = await fetch(`/api/progress/${currentType}`, { credentials: "include" });
+            const progressData = await progressRes.json();
+            if (!progressData.success) throw new Error("Gagal mengambil progress.");
+            currentLevel = progressData.progress.currentLevel || 1;
+          }
+
+          // Gunakan endpoint baru untuk Kanji
+          const response = await fetch("/api/kanji/flashcards", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ level: currentLevel }),
+            credentials: "include",
+          });
+          const data = await response.json();
+          if (!data.success) throw new Error(data.error);
+
+          flashcards = data.flashcards;
+          currentCardIndex = 0;
+          showFlashcardsScreen();
+          updateFlashcard();
+          document.getElementById("typeLevel").textContent = `Kanji - Level ${currentLevel}`;
+        } catch (error) {
+          alert("Terjadi kesalahan: " + error.message);
+        } finally {
+          hideLoading();
+        }
+      }
+
+      // --- UI & FLASHCARD LOGIC ---
+      function showFlashcardsScreen() {
+        document.getElementById("welcomeScreen").classList.add("hidden");
+        document.getElementById("flashcardsScreen").classList.remove("hidden");
+      }
+
+      function updateFlashcard() {
+        if (!flashcards || flashcards.length === 0) return;
+        const card = flashcards[currentCardIndex];
+        document.getElementById("kanjiCharacter").textContent = card.kanji;
+        document.getElementById("kanjiOnyomi").textContent = card.onyomi;
+        document.getElementById("kanjiKunyomi").textContent = card.kunyomi;
+        document.getElementById("kanjiFurigana").textContent = card.romaji;
+        document.getElementById("kanjiMeaning").textContent = card.meaning;
+
+        document.getElementById("progressText").textContent = `Kartu ${currentCardIndex + 1} dari ${flashcards.length}`;
+        document.getElementById("progressBar").style.width = `${((currentCardIndex + 1) / flashcards.length) * 100}%`;
+
+        document.getElementById("flashcard").classList.remove("flipped");
+        document.getElementById("prevBtn").disabled = currentCardIndex === 0;
+
+        const nextBtn = document.getElementById("nextBtn");
+        if (currentCardIndex === flashcards.length - 1) {
+          nextBtn.textContent = "Mulai Kuis 🧠";
+          nextBtn.onclick = startQuiz;
+        } else {
+          nextBtn.textContent = "→";
+          nextBtn.onclick = nextCard;
+        }
+      }
+
+      function previousCard() {
+        if (currentCardIndex > 0) {
+          currentCardIndex--;
+          updateFlashcard();
+        }
+      }
+      function nextCard() {
+        if (currentCardIndex < flashcards.length - 1) {
+          currentCardIndex++;
+          updateFlashcard();
+        }
+      }
+
+      // --- QUIZ LOGIC ---
+      async function startQuiz() {
+        showLoading();
+        try {
+          // Endpoint quiz tetap sama, karena generik
+          const response = await fetch("/api/quiz", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type: "Kanji", flashcards: flashcards }),
+            credentials: "include",
+          });
+          const data = await response.json();
+          if (!data.success) throw new Error(data.error);
+
+          quiz = data.quiz;
+          currentQuestionIndex = 0;
+          quizScore = 0;
+          selectedAnswer = null;
+          showQuizScreen();
+          updateQuizQuestion();
+        } catch (error) {
+          alert("Gagal memuat kuis: " + error.message);
+        } finally {
+          hideLoading();
+        }
+      }
+
+      function showQuizScreen() {
+        document.getElementById("flashcardsScreen").classList.add("hidden");
+        document.getElementById("quizScreen").classList.remove("hidden");
+      }
+
+      function updateQuizQuestion() {
+        const question = quiz.questions[currentQuestionIndex];
+        document.getElementById("questionText").textContent = question.question;
+        document.getElementById("quizProgressText").textContent = `Soal ${currentQuestionIndex + 1} dari ${quiz.questions.length}`;
+        document.getElementById("quizScoreText").textContent = `Skor: ${quizScore}`;
+        document.getElementById("quizProgressBar").style.width = `${((currentQuestionIndex + 1) / quiz.questions.length) * 100}%`;
+
+        const optionsContainer = document.getElementById("optionsContainer");
+        optionsContainer.innerHTML = "";
+        question.options.forEach((option, index) => {
+          const button = document.createElement("button");
+          button.className = "option-btn bg-blue-700 hover:bg-blue-600 font-bold py-3 px-4 rounded-lg transition-colors border-2 border-transparent text-white";
+          button.textContent = option;
+          button.onclick = () => selectAnswer(index);
+          optionsContainer.appendChild(button);
+        });
+        document.getElementById("nextQuestionBtn").classList.add("hidden");
+      }
+
+      function selectAnswer(answerIndex) {
+        if (selectedAnswer !== null) return;
+        selectedAnswer = answerIndex;
+        const question = quiz.questions[currentQuestionIndex];
+        const isCorrect = answerIndex === question.correctAnswer;
+        if (isCorrect) quizScore++;
+
+        document.querySelectorAll(".option-btn").forEach((btn, index) => {
+          btn.disabled = true;
+          if (index === question.correctAnswer) btn.classList.add("border-green-400", "bg-green-600");
+          else if (index === answerIndex) btn.classList.add("border-red-400", "bg-red-600");
         });
 
-        function hideLoading() { document.getElementById('loadingScreen').classList.add('hidden'); }
-        function showLoading() { document.getElementById('loadingScreen').classList.remove('hidden'); }
+        const nextBtn = document.getElementById("nextQuestionBtn");
+        nextBtn.textContent = currentQuestionIndex === quiz.questions.length - 1 ? "Lihat Hasil" : "Lanjut";
+        nextBtn.onclick = currentQuestionIndex === quiz.questions.length - 1 ? showQuizResult : nextQuestion;
+        nextBtn.classList.remove("hidden");
+      }
 
-        // --- PROGRESS & DATA FETCHING ---
-        async function loadProgress() {
-            try {
-                const response = await fetch(`/api/progress/${currentType}`, { credentials: 'include' });
-                const data = await response.json();
-                if (data.success) {
-                    document.getElementById('kanjiLevel').textContent = data.progress.currentLevel || 1;
-                    document.getElementById('kanjiScore').textContent = data.progress.averageScore || 0;
-                }
-            } catch (error) { console.error('Error loading progress:', error); }
+      function nextQuestion() {
+        currentQuestionIndex++;
+        selectedAnswer = null;
+        updateQuizQuestion();
+      }
+
+      async function showQuizResult() {
+        showLoading();
+        const percentage = Math.round((quizScore / quiz.questions.length) * 100);
+        let resultData = null;
+        try {
+          // Endpoint result tetap sama
+          const response = await fetch("/api/quiz/result", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type: currentType, level: currentLevel, score: quizScore, totalQuestions: quiz.questions.length }),
+            credentials: "include",
+          });
+          resultData = await response.json();
+        } catch (error) {
+          console.error("Error saving quiz result:", error);
+        } finally {
+          hideLoading();
         }
 
-        async function startFlashcards(newLevel = null) {
-            showLoading();
-            try {
-                if (newLevel !== null) {
-                    currentLevel = newLevel;
-                } else {
-                    const progressRes = await fetch(`/api/progress/${currentType}`, { credentials: 'include' });
-                    const progressData = await progressRes.json();
-                    if (!progressData.success) throw new Error('Gagal mengambil progress.');
-                    currentLevel = progressData.progress.currentLevel || 1;
-                }
+        document.getElementById("resultEmoji").textContent = percentage >= 70 ? (percentage >= 80 ? "🎉" : "👍") : "💪";
+        document.getElementById("resultTitle").textContent = percentage >= 70 ? (percentage >= 80 ? "Luar Biasa!" : "Kerja Bagus!") : "Terus Berlatih!";
+        document.getElementById("resultMessage").textContent = `Anda menjawab ${quizScore} dari ${quiz.questions.length} soal dengan benar!`;
+        document.getElementById("resultPercentage").textContent = `${percentage}%`;
 
-                // Gunakan endpoint baru untuk Kanji
-                const response = await fetch('/api/kanji/flashcards', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ level: currentLevel }),
-                    credentials: 'include'
-                });
-                const data = await response.json();
-                if (!data.success) throw new Error(data.error);
+        const continueBtn = document.getElementById("continueBtn");
+        continueBtn.onclick = () => continueStudy(resultData && resultData.success ? resultData.newLevel : currentLevel);
 
-                flashcards = data.flashcards;
-                currentCardIndex = 0;
-                showFlashcardsScreen();
-                updateFlashcard();
-                document.getElementById('typeLevel').textContent = `Kanji - Level ${currentLevel}`;
+        document.getElementById("quizModal").classList.remove("hidden");
+        setTimeout(() => document.getElementById("modalContent").classList.remove("scale-95"), 100);
+      }
 
-            } catch (error) {
-                alert('Terjadi kesalahan: ' + error.message);
-            } finally {
-                hideLoading();
-            }
-        }
+      // --- NAVIGATION & MODALS ---
+      function continueStudy(newLevel) {
+        closeModal();
+        startFlashcards(newLevel);
+      }
 
-        // --- UI & FLASHCARD LOGIC ---
-        function showFlashcardsScreen() {
-            document.getElementById('welcomeScreen').classList.add('hidden');
-            document.getElementById('flashcardsScreen').classList.remove('hidden');
-        }
+      function backToWelcome() {
+        closeModal();
+        document.getElementById("quizScreen").classList.add("hidden");
+        document.getElementById("flashcardsScreen").classList.add("hidden");
+        document.getElementById("welcomeScreen").classList.remove("hidden");
+        loadProgress();
+      }
 
-        function updateFlashcard() {
-            if (!flashcards || flashcards.length === 0) return;
-            const card = flashcards[currentCardIndex];
-            document.getElementById('kanjiCharacter').textContent = card.kanji;
-            document.getElementById('kanjiOnyomi').textContent = card.onyomi;
-            document.getElementById('kanjiKunyomi').textContent = card.kunyomi;
-            document.getElementById('kanjiFurigana').textContent = card.romaji;
-            document.getElementById('kanjiMeaning').textContent = card.meaning;
-            
-            document.getElementById('progressText').textContent = `Kartu ${currentCardIndex + 1} dari ${flashcards.length}`;
-            document.getElementById('progressBar').style.width = `${((currentCardIndex + 1) / flashcards.length) * 100}%`;
-            
-            document.getElementById('flashcard').classList.remove('flipped');
-            document.getElementById('prevBtn').disabled = currentCardIndex === 0;
-            
-            const nextBtn = document.getElementById('nextBtn');
-            if (currentCardIndex === flashcards.length - 1) {
-                nextBtn.textContent = 'Mulai Kuis 🧠';
-                nextBtn.onclick = startQuiz;
-            } else {
-                nextBtn.textContent = '→';
-                nextBtn.onclick = nextCard;
-            }
-        }
-
-        function previousCard() { if (currentCardIndex > 0) { currentCardIndex--; updateFlashcard(); } }
-        function nextCard() { if (currentCardIndex < flashcards.length - 1) { currentCardIndex++; updateFlashcard(); } }
-
-        // --- QUIZ LOGIC ---
-        async function startQuiz() {
-            showLoading();
-            try {
-                // Endpoint quiz tetap sama, karena generik
-                const response = await fetch('/api/quiz', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ type: 'Kanji', flashcards: flashcards }),
-                    credentials: 'include'
-                });
-                const data = await response.json();
-                if (!data.success) throw new Error(data.error);
-                
-                quiz = data.quiz;
-                currentQuestionIndex = 0;
-                quizScore = 0;
-                selectedAnswer = null;
-                showQuizScreen();
-                updateQuizQuestion();
-            } catch (error) {
-                alert('Gagal memuat kuis: ' + error.message);
-            } finally {
-                hideLoading();
-            }
-        }
-        
-        function showQuizScreen() {
-            document.getElementById('flashcardsScreen').classList.add('hidden');
-            document.getElementById('quizScreen').classList.remove('hidden');
-        }
-
-        function updateQuizQuestion() {
-            const question = quiz.questions[currentQuestionIndex];
-            document.getElementById('questionText').textContent = question.question;
-            document.getElementById('quizProgressText').textContent = `Soal ${currentQuestionIndex + 1} dari ${quiz.questions.length}`;
-            document.getElementById('quizScoreText').textContent = `Skor: ${quizScore}`;
-            document.getElementById('quizProgressBar').style.width = `${((currentQuestionIndex + 1) / quiz.questions.length) * 100}%`;
-            
-            const optionsContainer = document.getElementById('optionsContainer');
-            optionsContainer.innerHTML = '';
-            question.options.forEach((option, index) => {
-                const button = document.createElement('button');
-                button.className = 'option-btn bg-blue-700 hover:bg-blue-600 font-bold py-3 px-4 rounded-lg transition-colors border-2 border-transparent text-white';
-                button.textContent = option;
-                button.onclick = () => selectAnswer(index);
-                optionsContainer.appendChild(button);
-            });
-            document.getElementById('nextQuestionBtn').classList.add('hidden');
-        }
-
-        function selectAnswer(answerIndex) {
-            if (selectedAnswer !== null) return;
-            selectedAnswer = answerIndex;
-            const question = quiz.questions[currentQuestionIndex];
-            const isCorrect = answerIndex === question.correctAnswer;
-            if (isCorrect) quizScore++;
-            
-            document.querySelectorAll('.option-btn').forEach((btn, index) => {
-                btn.disabled = true;
-                if (index === question.correctAnswer) btn.classList.add('border-green-400', 'bg-green-600');
-                else if (index === answerIndex) btn.classList.add('border-red-400', 'bg-red-600');
-            });
-            
-            const nextBtn = document.getElementById('nextQuestionBtn');
-            nextBtn.textContent = (currentQuestionIndex === quiz.questions.length - 1) ? 'Lihat Hasil' : 'Lanjut';
-            nextBtn.onclick = (currentQuestionIndex === quiz.questions.length - 1) ? showQuizResult : nextQuestion;
-            nextBtn.classList.remove('hidden');
-        }
-
-        function nextQuestion() {
-            currentQuestionIndex++;
-            selectedAnswer = null;
-            updateQuizQuestion();
-        }
-
-        async function showQuizResult() {
-            showLoading();
-            const percentage = Math.round((quizScore / quiz.questions.length) * 100);
-            let resultData = null;
-            try {
-                // Endpoint result tetap sama
-                const response = await fetch('/api/quiz/result', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ type: currentType, level: currentLevel, score: quizScore, totalQuestions: quiz.questions.length }),
-                    credentials: 'include'
-                });
-                resultData = await response.json();
-            } catch (error) { console.error('Error saving quiz result:', error); }
-            finally { hideLoading(); }
-            
-            document.getElementById('resultEmoji').textContent = percentage >= 70 ? (percentage >= 80 ? '🎉' : '👍') : '💪';
-            document.getElementById('resultTitle').textContent = percentage >= 70 ? (percentage >= 80 ? 'Luar Biasa!' : 'Kerja Bagus!') : 'Terus Berlatih!';
-            document.getElementById('resultMessage').textContent = `Anda menjawab ${quizScore} dari ${quiz.questions.length} soal dengan benar!`;
-            document.getElementById('resultPercentage').textContent = `${percentage}%`;
-            
-            const continueBtn = document.getElementById('continueBtn');
-            continueBtn.onclick = () => continueStudy(resultData && resultData.success ? resultData.newLevel : currentLevel);
-            
-            document.getElementById('quizModal').classList.remove('hidden');
-            setTimeout(() => document.getElementById('modalContent').classList.remove('scale-95'), 100);
-        }
-
-        // --- NAVIGATION & MODALS ---
-        function continueStudy(newLevel) {
-            closeModal();
-            startFlashcards(newLevel);
-        }
-
-        function backToWelcome() {
-            closeModal();
-            document.getElementById('quizScreen').classList.add('hidden');
-            document.getElementById('flashcardsScreen').classList.add('hidden');
-            document.getElementById('welcomeScreen').classList.remove('hidden');
-            loadProgress();
-        }
-
-        function closeModal() {
-            document.getElementById('modalContent').classList.add('scale-95');
-            setTimeout(() => document.getElementById('quizModal').classList.add('hidden'), 200);
-        }
+      function closeModal() {
+        document.getElementById("modalContent").classList.add("scale-95");
+        setTimeout(() => document.getElementById("quizModal").classList.add("hidden"), 200);
+      }
     </script>
-</body>
+  </body>
 </html>

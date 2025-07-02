@@ -1,663 +1,648 @@
 <!DOCTYPE html>
 <html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Flashcards - Nihongo Journey</title>
     <script src="https://cdn.tailwindcss.com"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-auth-compat.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-database-compat.min.js"></script>
 
     <style>
-        .flip-card {
-            background-color: transparent;
-            width: 100%;
-            height: 300px;
-            perspective: 1000px;
+      .flip-card {
+        background-color: transparent;
+        width: 100%;
+        height: 300px;
+        perspective: 1000px;
+      }
+
+      .flip-card-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        transition: transform 0.8s;
+        transform-style: preserve-3d;
+      }
+
+      .flip-card.flipped .flip-card-inner {
+        transform: rotateY(180deg);
+      }
+
+      .flip-card-front,
+      .flip-card-back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        -webkit-backface-visibility: hidden; /* Safari */
+        backface-visibility: hidden;
+        border-radius: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .flip-card-back {
+        transform: rotateY(180deg);
+      }
+
+      .character-text {
+        font-size: 6rem;
+        font-weight: bold;
+      }
+
+      .romaji-text {
+        font-size: 3rem;
+        font-weight: bold;
+      }
+
+      .progress-bar {
+        transition: width 0.3s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
         }
-        
-        .flip-card-inner {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            text-align: center;
-            transition: transform 0.8s;
-            transform-style: preserve-3d;
+        to {
+          opacity: 1;
+          transform: translateY(0);
         }
-        
-        .flip-card.flipped .flip-card-inner {
-            transform: rotateY(180deg);
-        }
-        
-        .flip-card-front, .flip-card-back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            -webkit-backface-visibility: hidden; /* Safari */
-            backface-visibility: hidden;
-            border-radius: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .flip-card-back {
-            transform: rotateY(180deg);
-        }
-        
-        .character-text {
-            font-size: 6rem;
-            font-weight: bold;
-        }
-        
-        .romaji-text {
-            font-size: 3rem;
-            font-weight: bold;
-        }
-        
-        .progress-bar {
-            transition: width 0.3s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .fade-in {
-            animation: fadeIn 0.5s ease-out;
-        }
+      }
+
+      .fade-in {
+        animation: fadeIn 0.5s ease-out;
+      }
     </style>
-</head>
-<body class="bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 min-h-screen text-white">
-     <div class="bg-white shadow-sm border-b sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  </head>
+  <body class="bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 min-h-screen text-white">
+    <div class="bg-white shadow-sm border-b sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center py-4">
-            <!-- Logo/Brand -->
-            <h1 class="text-lg font-bold text-gray-900">Dashboard</h1>
-            
-            <!-- Desktop Navigation -->
-            <nav class="hidden md:flex items-center space-x-8">
-                <a href="/Dashboard/user" class="text-gray-600 hover:text-gray-900 transition-colors">Dashboard</a>
-                <a href="/Dashboard/roadmap" class="text-gray-600 hover:text-gray-900 transition-colors">Roadmap</a>
-                <a href="/Dashboard/flashcards" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Flashcards</a>
-                <a href="/Dashboard/kanji" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Kanji</a>
-                
-               
-            </nav>
-            
-            <!-- Mobile Menu Button -->
-            <div class="md:hidden flex items-center">
-                <div id="userInfoMobile" class="hidden flex items-center mr-4">
-                    <span id="userNameMobile" class="text-sm text-gray-600 truncate max-w-xs"></span>
-                </div>
-                <button id="mobile-menu-button" class="text-gray-500 hover:text-gray-900 focus:outline-none">
-                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                </button>
+          <!-- Logo/Brand -->
+          <h1 class="text-lg font-bold text-gray-900">Dashboard</h1>
+
+          <!-- Desktop Navigation -->
+          <nav class="hidden md:flex items-center space-x-8">
+            <a href="/Dashboard/user" class="text-gray-600 hover:text-gray-900 transition-colors">Dashboard</a>
+            <a href="/Dashboard/roadmap" class="text-gray-600 hover:text-gray-900 transition-colors">Roadmap</a>
+            <a href="/Dashboard/flashcards" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Flashcards</a>
+            <a href="/Dashboard/kanji" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Kanji</a>
+          </nav>
+
+          <!-- Mobile Menu Button -->
+          <div class="md:hidden flex items-center">
+            <div id="userInfoMobile" class="hidden flex items-center mr-4">
+              <span id="userNameMobile" class="text-sm text-gray-600 truncate max-w-xs"></span>
             </div>
+            <button id="mobile-menu-button" class="text-gray-500 hover:text-gray-900 focus:outline-none">
+              <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
         </div>
-    </div>
-    
-    <!-- Mobile Menu (Hidden by default) -->
-    <div id="mobile-menu" class="fixed inset-0 z-40 hidden">
+      </div>
+
+      <!-- Mobile Menu (Hidden by default) -->
+      <div id="mobile-menu" class="fixed inset-0 z-40 hidden">
         <!-- Overlay -->
         <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" id="mobile-menu-overlay"></div>
-        
+
         <!-- Menu Container (Slides from right) -->
         <div class="fixed inset-y-0 right-0 max-w-xs w-full bg-white shadow-xl transform transition-transform duration-300 ease-in-out translate-x-full">
-            <div class="flex flex-col h-full">
-                <!-- Menu Header -->
-                <div class="flex justify-between items-center px-4 py-4 border-b">
-                   <img id="userPhoto" class="w-8 h-8 rounded-full" alt="User Photo">
-                   <h2 id="userName" class="flex text-gray-700"></h2>
-                    <button id="mobile-menu-close" class="text-gray-500 hover:text-gray-900">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-                
-                <!-- Menu Items -->
-                <div class="flex-1 overflow-y-auto px-4 py-6 space-y-4">
-                <a href="/Dashboard/user" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
-                <a href="/Dashboard/roadmap" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Roadmap</a>
-                <a href="/Dashboard/flashcards" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Flashcards</a>
-                <a href="/Dashboard/kanji" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Kanji</a>
-                
-                </div>
-                
-                <!-- Footer with Sign Out -->
-                <div class="px-4 py-4 border-t">
-                    
-                       
-                </div>
+          <div class="flex flex-col h-full">
+            <!-- Menu Header -->
+            <div class="flex justify-between items-center px-4 py-4 border-b">
+              <img id="userPhoto" class="w-8 h-8 rounded-full" alt="User Photo" />
+              <h2 id="userName" class="flex text-gray-700"></h2>
+              <button id="mobile-menu-close" class="text-gray-500 hover:text-gray-900">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
+
+            <!-- Menu Items -->
+            <div class="flex-1 overflow-y-auto px-4 py-6 space-y-4">
+              <a href="/Dashboard/user" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
+              <a href="/Dashboard/roadmap" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Roadmap</a>
+              <a href="/Dashboard/flashcards" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Flashcards</a>
+              <a href="/Dashboard/kanji" class="block text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-base font-medium">Kanji</a>
+            </div>
+
+            <!-- Footer with Sign Out -->
+            <div class="px-4 py-4 border-t"></div>
+          </div>
         </div>
-    </div>
-    <!-- script -->
+      </div>
+      <!-- script -->
       <script>
-    // Mobile menu functionality
-    const mobileMenuButton = document.getElementById('mobile-menu-button');
-    const mobileMenuClose = document.getElementById('mobile-menu-close');
-    const mobileMenu = document.getElementById('mobile-menu');
-    const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
-    const mobileMenuContainer = mobileMenu.querySelector('.max-w-xs');
+        // Mobile menu functionality
+        const mobileMenuButton = document.getElementById("mobile-menu-button");
+        const mobileMenuClose = document.getElementById("mobile-menu-close");
+        const mobileMenu = document.getElementById("mobile-menu");
+        const mobileMenuOverlay = document.getElementById("mobile-menu-overlay");
+        const mobileMenuContainer = mobileMenu.querySelector(".max-w-xs");
 
-    function openMobileMenu() {
-        mobileMenu.classList.remove('hidden');
-        setTimeout(() => {
-            mobileMenuOverlay.classList.remove('opacity-0');
-            mobileMenuContainer.classList.remove('translate-x-full');
-        }, 20);
-    }
-
-    function closeMobileMenu() {
-        mobileMenuOverlay.classList.add('opacity-0');
-        mobileMenuContainer.classList.add('translate-x-full');
-        setTimeout(() => {
-            mobileMenu.classList.add('hidden');
-        }, 300);
-    }
-
-    mobileMenuButton.addEventListener('click', openMobileMenu);
-    mobileMenuClose.addEventListener('click', closeMobileMenu);
-    mobileMenuOverlay.addEventListener('click', closeMobileMenu);
-
-    // Close menu when clicking outside
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && !mobileMenu.classList.contains('hidden')) {
-            closeMobileMenu();
+        function openMobileMenu() {
+          mobileMenu.classList.remove("hidden");
+          setTimeout(() => {
+            mobileMenuOverlay.classList.remove("opacity-0");
+            mobileMenuContainer.classList.remove("translate-x-full");
+          }, 20);
         }
-    });
-    </script>
-</div>
+
+        function closeMobileMenu() {
+          mobileMenuOverlay.classList.add("opacity-0");
+          mobileMenuContainer.classList.add("translate-x-full");
+          setTimeout(() => {
+            mobileMenu.classList.add("hidden");
+          }, 300);
+        }
+
+        mobileMenuButton.addEventListener("click", openMobileMenu);
+        mobileMenuClose.addEventListener("click", closeMobileMenu);
+        mobileMenuOverlay.addEventListener("click", closeMobileMenu);
+
+        // Close menu when clicking outside
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && !mobileMenu.classList.contains("hidden")) {
+            closeMobileMenu();
+          }
+        });
+      </script>
+    </div>
     <div id="loadingScreen" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-        <div class="text-center">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-            <p class="text-white text-lg">Memuat...</p>
-        </div>
+      <div class="text-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+        <p class="text-white text-lg">Memuat...</p>
+      </div>
     </div>
 
     <div class="container mx-auto px-4 py-8">
-        <div class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-white mb-4">🃏 Flashcards Belajar</h1>
-            <p class="text-gray-300">Pilih jenis karakter yang ingin dipelajari</p>
+      <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-white mb-4">🃏 Flashcards Belajar</h1>
+        <p class="text-gray-300">Pilih jenis karakter yang ingin dipelajari</p>
+      </div>
+
+      <div id="welcomeScreen" class="max-w-2xl mx-auto">
+        <div class="bg-white bg-opacity-10 backdrop-blur-lg rounded-2xl p-8 shadow-xl">
+          <h2 class="text-2xl font-bold text-white text-center mb-6">Pilih Jenis Karakter</h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            <div class="bg-blue-500 bg-opacity-20 rounded-lg p-4">
+              <h3 class="text-white font-bold mb-2">🌸 Hiragana</h3>
+              <p class="text-gray-300 text-sm mb-2">Level: <span id="hiraganaLevel">1</span></p>
+              <p class="text-gray-300 text-sm">Skor Rata-rata: <span id="hiraganaScore">0</span>%</p>
+            </div>
+            <div class="bg-green-500 bg-opacity-20 rounded-lg p-4">
+              <h3 class="text-white font-bold mb-2">🗾 Katakana</h3>
+              <p class="text-gray-300 text-sm mb-2">Level: <span id="katakanaLevel">1</span></p>
+              <p class="text-gray-300 text-sm">Skor Rata-rata: <span id="katakanaScore">0</span>%</p>
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-4">
+            <button onclick="startFlashcards('hiragana')" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-lg transition-colors duration-200">🌸 Belajar Hiragana</button>
+            <button onclick="startFlashcards('katakana')" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded-lg transition-colors duration-200">🗾 Belajar Katakana</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="flashcardsScreen" class="hidden max-w-2xl mx-auto">
+        <div class="mb-6">
+          <div class="flex justify-between text-white text-sm mb-2">
+            <span id="progressText">Kartu 1 dari 10</span>
+            <span id="typeLevel">Hiragana - Level 1</span>
+          </div>
+          <div class="w-full bg-gray-700 rounded-full h-2">
+            <div id="progressBar" class="progress-bar bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full" style="width: 10%"></div>
+          </div>
         </div>
 
-        <div id="welcomeScreen" class="max-w-2xl mx-auto">
-            <div class="bg-white bg-opacity-10 backdrop-blur-lg rounded-2xl p-8 shadow-xl">
-                <h2 class="text-2xl font-bold text-white text-center mb-6">Pilih Jenis Karakter</h2>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                    <div class="bg-blue-500 bg-opacity-20 rounded-lg p-4">
-                        <h3 class="text-white font-bold mb-2">🌸 Hiragana</h3>
-                        <p class="text-gray-300 text-sm mb-2">Level: <span id="hiraganaLevel">1</span></p>
-                        <p class="text-gray-300 text-sm">Skor Rata-rata: <span id="hiraganaScore">0</span>%</p>
-                    </div>
-                    <div class="bg-green-500 bg-opacity-20 rounded-lg p-4">
-                        <h3 class="text-white font-bold mb-2">🗾 Katakana</h3>
-                        <p class="text-gray-300 text-sm mb-2">Level: <span id="katakanaLevel">1</span></p>
-                        <p class="text-gray-300 text-sm">Skor Rata-rata: <span id="katakanaScore">0</span>%</p>
-                    </div>
-                </div>
-                
-                <div class="flex flex-col sm:flex-row gap-4">
-                    <button onclick="startFlashcards('hiragana')" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-lg transition-colors duration-200">
-                        🌸 Belajar Hiragana
-                    </button>
-                    <button onclick="startFlashcards('katakana')" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded-lg transition-colors duration-200">
-                        🗾 Belajar Katakana
-                    </button>
-                </div>
+        <div class="flip-card mx-auto max-w-md mb-6" id="flashcard" onclick="flipCard()">
+          <div class="flip-card-inner">
+            <div class="flip-card-front bg-gradient-to-br from-blue-500 to-purple-600 text-white shadow-2xl">
+              <div class="text-center">
+                <div class="character-text" id="characterText">あ</div>
+              </div>
             </div>
+            <div class="flip-card-back bg-gradient-to-br from-green-500 to-blue-600 text-white shadow-2xl">
+              <div class="text-center">
+                <div class="romaji-text" id="romajiText">a</div>
+                <p class="mt-4 text-lg" id="meaningText"></p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div id="flashcardsScreen" class="hidden max-w-2xl mx-auto">
-            <div class="mb-6">
-                <div class="flex justify-between text-white text-sm mb-2">
-                    <span id="progressText">Kartu 1 dari 10</span>
-                    <span id="typeLevel">Hiragana - Level 1</span>
-                </div>
-                <div class="w-full bg-gray-700 rounded-full h-2">
-                    <div id="progressBar" class="progress-bar bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full" style="width: 10%"></div>
-                </div>
-            </div>
-
-            <div class="flip-card mx-auto max-w-md mb-6" id="flashcard" onclick="flipCard()">
-                <div class="flip-card-inner">
-                    <div class="flip-card-front bg-gradient-to-br from-blue-500 to-purple-600 text-white shadow-2xl">
-                        <div class="text-center">
-                            <div class="character-text" id="characterText">あ</div>
-                        </div>
-                    </div>
-                    <div class="flip-card-back bg-gradient-to-br from-green-500 to-blue-600 text-white shadow-2xl">
-                        <div class="text-center">
-                            <div class="romaji-text" id="romajiText">a</div>
-                            <p class="mt-4 text-lg " id="meaningText"></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="text-center">
-                <p class="text-gray-300 mb-4">Klik kartu untuk melihat jawaban</p>
-                <div class="flex gap-4 justify-center">
-                    <button onclick="previousCard()" id="prevBtn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg transition-colors duration-200 disabled:opacity-50" disabled>
-                        ← Sebelumnya
-                    </button>
-                    <button onclick="nextCard()" id="nextBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors duration-200">
-                        Selanjutnya →
-                    </button>
-                </div>
-            </div>
+        <div class="text-center">
+          <p class="text-gray-300 mb-4">Klik kartu untuk melihat jawaban</p>
+          <div class="flex gap-4 justify-center">
+            <button onclick="previousCard()" id="prevBtn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg transition-colors duration-200 disabled:opacity-50" disabled>← Sebelumnya</button>
+            <button onclick="nextCard()" id="nextBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors duration-200">Selanjutnya →</button>
+          </div>
         </div>
+      </div>
 
-        <div id="quizScreen" class="hidden max-w-2xl mx-auto">
-            <div class="bg-white bg-opacity-10 backdrop-blur-lg rounded-2xl p-8 shadow-xl">
-                <div class="text-center mb-6">
-                    <h2 class="text-2xl font-bold text-white mb-2">🧠 Quiz Time!</h2>
-                    <p class="text-gray-300">Uji pengetahuan Anda</p>
-                </div>
+      <div id="quizScreen" class="hidden max-w-2xl mx-auto">
+        <div class="bg-white bg-opacity-10 backdrop-blur-lg rounded-2xl p-8 shadow-xl">
+          <div class="text-center mb-6">
+            <h2 class="text-2xl font-bold text-white mb-2">🧠 Quiz Time!</h2>
+            <p class="text-gray-300">Uji pengetahuan Anda</p>
+          </div>
 
-                <div class="mb-6">
-                    <div class="flex justify-between text-white text-sm mb-2">
-                        <span id="quizProgressText">Soal 1 dari 5</span>
-                        <span id="quizScore">Skor: 0/5</span>
-                    </div>
-                    <div class="w-full bg-gray-700 rounded-full h-2">
-                        <div id="quizProgressBar" class="progress-bar bg-gradient-to-r from-yellow-500 to-red-500 h-2 rounded-full" style="width: 20%"></div>
-                    </div>
-                </div>
-
-                <div class="mb-6">
-                    <h3 class="text-xl text-white font-bold mb-4 text-center" id="questionText"></h3>
-                    <div class="text-center mb-6">
-                        <span class="character-text text-white" id="questionCharacter"></span>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4 mb-6" id="optionsContainer">
-                    </div>
-
-                <div class="text-center">
-                    <button id="nextQuestionBtn" class="hidden bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-200">
-                        Soal Selanjutnya
-                    </button>
-                </div>
+          <div class="mb-6">
+            <div class="flex justify-between text-white text-sm mb-2">
+              <span id="quizProgressText">Soal 1 dari 5</span>
+              <span id="quizScore">Skor: 0/5</span>
             </div>
+            <div class="w-full bg-gray-700 rounded-full h-2">
+              <div id="quizProgressBar" class="progress-bar bg-gradient-to-r from-yellow-500 to-red-500 h-2 rounded-full" style="width: 20%"></div>
+            </div>
+          </div>
+
+          <div class="mb-6">
+            <h3 class="text-xl text-white font-bold mb-4 text-center" id="questionText"></h3>
+            <div class="text-center mb-6">
+              <span class="character-text text-white" id="questionCharacter"></span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4 mb-6" id="optionsContainer"></div>
+
+          <div class="text-center">
+            <button id="nextQuestionBtn" class="hidden bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-200">Soal Selanjutnya</button>
+          </div>
         </div>
+      </div>
     </div>
 
     <div id="quizModal" class="fixed inset-0 bg-black bg-opacity-75 hidden flex items-center justify-center z-50">
-        <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 text-gray-800 transform transition-all duration-300 scale-95" id="modalContent">
-            <div class="text-center">
-                <div class="text-6xl mb-4" id="resultEmoji">🎉</div>
-                <h3 class="text-2xl font-bold mb-2" id="resultTitle"></h3>
-                <p class="text-gray-600 mb-4" id="resultMessage"></p>
-                <div class="text-3xl font-bold text-blue-600 mb-6" id="resultPercentage"></div>
-                
-                <div class="flex gap-4">
-                    <button id="continueBtn" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200">
-                        Lanjut Belajar
-                    </button>
-                    <button onclick="backToWelcome()" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200">
-                        Kembali
-                    </button>
-                </div>
-            </div>
+      <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 text-gray-800 transform transition-all duration-300 scale-95" id="modalContent">
+        <div class="text-center">
+          <div class="text-6xl mb-4" id="resultEmoji">🎉</div>
+          <h3 class="text-2xl font-bold mb-2" id="resultTitle"></h3>
+          <p class="text-gray-600 mb-4" id="resultMessage"></p>
+          <div class="text-3xl font-bold text-blue-600 mb-6" id="resultPercentage"></div>
+
+          <div class="flex gap-4">
+            <button id="continueBtn" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200">Lanjut Belajar</button>
+            <button onclick="backToWelcome()" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200">Kembali</button>
+          </div>
         </div>
+      </div>
     </div>
 
     <script>
-    // Global variables
-    let currentType = '';
-    let currentLevel = 1;
-    let flashcards = [];
-    let currentCardIndex = 0;
-    let quiz = null;
-    let currentQuestionIndex = 0;
-    let quizScore = 0;
-    let selectedAnswer = null;
-const firebaseConfig = {
-  apiKey: "AIzaSyDpyrC1-1xl6pyCLKBd4mZbW93K1F95FJs",
-  authDomain: "nihongo-journey.firebaseapp.com",
-  projectId: "nihongo-journey",
-  storageBucket: "nihongo-journey.firebasestorage.app",
-  messagingSenderId: "966989016758",
-  appId: "1:966989016758:web:25d43be34bbc1a1342c017",
-  measurementId: "G-2J392RPFMR"
-};
-     // Initialize Firebase
- firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const database = firebase.database();
-    // Initialize
-    document.addEventListener('DOMContentLoaded', function() {
+      // Global variables
+      let currentType = "";
+      let currentLevel = 1;
+      let flashcards = [];
+      let currentCardIndex = 0;
+      let quiz = null;
+      let currentQuestionIndex = 0;
+      let quizScore = 0;
+      let selectedAnswer = null;
+      const firebaseConfig = {
+        apiKey: "AIzaSyDpyrC1-1xl6pyCLKBd4mZbW93K1F95FJs",
+        authDomain: "nihongo-journey.firebaseapp.com",
+        projectId: "nihongo-journey",
+        storageBucket: "nihongo-journey.firebasestorage.app",
+        messagingSenderId: "966989016758",
+        appId: "1:966989016758:web:25d43be34bbc1a1342c017",
+        measurementId: "G-2J392RPFMR",
+      };
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+      const database = firebase.database();
+      // Initialize
+      document.addEventListener("DOMContentLoaded", function () {
         loadProgress();
         hideLoading();
-    });
+      });
 
-    function hideLoading() {
-        document.getElementById('loadingScreen').classList.add('hidden');
-    }
+      function hideLoading() {
+        document.getElementById("loadingScreen").classList.add("hidden");
+      }
 
-    function showLoading() {
-        document.getElementById('loadingScreen').classList.remove('hidden');
-    }
+      function showLoading() {
+        document.getElementById("loadingScreen").classList.remove("hidden");
+      }
 
-    // Load user progress from Firebase
-    async function loadProgress() {
+      // Load user progress from Firebase
+      async function loadProgress() {
         try {
-            const response = await fetch(`/api/progress/hiragana`, { credentials: 'include' });
-            const hiraganaData = await response.json();
-            
-            if (hiraganaData.success) {
-                document.getElementById('hiraganaLevel').textContent = hiraganaData.progress.currentLevel || 1;
-                document.getElementById('hiraganaScore').textContent = hiraganaData.progress.averageScore || 0;
-            }
+          const response = await fetch(`/api/progress/hiragana`, { credentials: "include" });
+          const hiraganaData = await response.json();
 
-            const response2 = await fetch(`/api/progress/katakana`, { credentials: 'include' });
-            const katakanaData = await response2.json();
-            
-            if (katakanaData.success) {
-                document.getElementById('katakanaLevel').textContent = katakanaData.progress.currentLevel || 1;
-                document.getElementById('katakanaScore').textContent = katakanaData.progress.averageScore || 0;
-            }
+          if (hiraganaData.success) {
+            document.getElementById("hiraganaLevel").textContent = hiraganaData.progress.currentLevel || 1;
+            document.getElementById("hiraganaScore").textContent = hiraganaData.progress.averageScore || 0;
+          }
+
+          const response2 = await fetch(`/api/progress/katakana`, { credentials: "include" });
+          const katakanaData = await response2.json();
+
+          if (katakanaData.success) {
+            document.getElementById("katakanaLevel").textContent = katakanaData.progress.currentLevel || 1;
+            document.getElementById("katakanaScore").textContent = katakanaData.progress.averageScore || 0;
+          }
         } catch (error) {
-            console.error('Error loading progress:', error);
+          console.error("Error loading progress:", error);
         }
-    }
+      }
 
-    // Start flashcards session
-    async function startFlashcards(type, newLevel = null) {
+      // Start flashcards session
+      async function startFlashcards(type, newLevel = null) {
         currentType = type;
         showLoading();
 
         try {
-            // Jika tidak ada level baru yang diberikan, baru kita ambil dari server.
-            // Ini hanya terjadi saat pertama kali memilih Hiragana/Katakana.
-            if (newLevel === null) {
-                const progressRes = await fetch(`/api/progress/${type}`, { credentials: 'include' });
-                const progressData = await progressRes.json();
-                if (!progressData.success) {
-                    throw new Error(progressData.error || 'Gagal mengambil progress.');
-                }
-                currentLevel = progressData.progress.currentLevel || 1;
-            } else {
-                // Jika ada level baru (dari setelah kuis), kita langsung pakai.
-                currentLevel = newLevel;
+          // Jika tidak ada level baru yang diberikan, baru kita ambil dari server.
+          // Ini hanya terjadi saat pertama kali memilih Hiragana/Katakana.
+          if (newLevel === null) {
+            const progressRes = await fetch(`/api/progress/${type}`, { credentials: "include" });
+            const progressData = await progressRes.json();
+            if (!progressData.success) {
+              throw new Error(progressData.error || "Gagal mengambil progress.");
             }
+            currentLevel = progressData.progress.currentLevel || 1;
+          } else {
+            // Jika ada level baru (dari setelah kuis), kita langsung pakai.
+            currentLevel = newLevel;
+          }
 
-            // Generate flashcards through backend
-            const response = await fetch('/api/flashcards', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ type: type, level: currentLevel }),
-                credentials: 'include'
-            });
+          // Generate flashcards through backend
+          const response = await fetch("/api/flashcards", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type: type, level: currentLevel }),
+            credentials: "include",
+          });
 
-            const data = await response.json();
+          const data = await response.json();
 
-            if (data.success) {
-                flashcards = data.flashcards;
-                currentCardIndex = 0;
-                showFlashcardsScreen();
-                updateFlashcard();
-                
-                document.getElementById('typeLevel').textContent = `${type.charAt(0).toUpperCase() + type.slice(1)} - Level ${currentLevel}`;
-            } else {
-                alert('Gagal memuat flashcards: ' + data.error);
-            }
+          if (data.success) {
+            flashcards = data.flashcards;
+            currentCardIndex = 0;
+            showFlashcardsScreen();
+            updateFlashcard();
+
+            document.getElementById("typeLevel").textContent = `${type.charAt(0).toUpperCase() + type.slice(1)} - Level ${currentLevel}`;
+          } else {
+            alert("Gagal memuat flashcards: " + data.error);
+          }
         } catch (error) {
-            console.error('Error starting flashcards:', error);
-            alert('Terjadi kesalahan saat memulai flashcards: ' + error.message);
+          console.error("Error starting flashcards:", error);
+          alert("Terjadi kesalahan saat memulai flashcards: " + error.message);
         } finally {
-            hideLoading();
+          hideLoading();
         }
-    }
+      }
 
-    // DIUBAH: continueStudy sekarang memanggil startFlashcards dengan level baru
-    function continueStudy(newLevel) {
+      // DIUBAH: continueStudy sekarang memanggil startFlashcards dengan level baru
+      function continueStudy(newLevel) {
         closeModal();
         // Langsung panggil startFlashcards dengan level yang sudah benar,
         // tidak perlu lagi mengatur variabel global di sini.
         startFlashcards(currentType, newLevel);
-    }
-    function showFlashcardsScreen() {
-        document.getElementById('welcomeScreen').classList.add('hidden');
-        document.getElementById('quizScreen').classList.add('hidden');
-        document.getElementById('flashcardsScreen').classList.remove('hidden');
-    }
+      }
+      function showFlashcardsScreen() {
+        document.getElementById("welcomeScreen").classList.add("hidden");
+        document.getElementById("quizScreen").classList.add("hidden");
+        document.getElementById("flashcardsScreen").classList.remove("hidden");
+      }
 
-    function updateFlashcard() {
+      function updateFlashcard() {
         if (!flashcards || flashcards.length === 0) return;
         const card = flashcards[currentCardIndex];
-        document.getElementById('characterText').textContent = card.character;
-        document.getElementById('romajiText').textContent = card.romaji;
-        document.getElementById('meaningText').textContent = card.meaning || ''; // Handle if meaning doesn't exist
-        
-        document.getElementById('progressText').textContent = `Kartu ${currentCardIndex + 1} dari ${flashcards.length}`;
-        document.getElementById('progressBar').style.width = `${((currentCardIndex + 1) / flashcards.length) * 100}%`;
-        
-        document.getElementById('flashcard').classList.remove('flipped');
-        
-        document.getElementById('prevBtn').disabled = currentCardIndex === 0;
-        
-        const nextBtn = document.getElementById('nextBtn');
+        document.getElementById("characterText").textContent = card.character;
+        document.getElementById("romajiText").textContent = card.romaji;
+        document.getElementById("meaningText").textContent = card.meaning || ""; // Handle if meaning doesn't exist
+
+        document.getElementById("progressText").textContent = `Kartu ${currentCardIndex + 1} dari ${flashcards.length}`;
+        document.getElementById("progressBar").style.width = `${((currentCardIndex + 1) / flashcards.length) * 100}%`;
+
+        document.getElementById("flashcard").classList.remove("flipped");
+
+        document.getElementById("prevBtn").disabled = currentCardIndex === 0;
+
+        const nextBtn = document.getElementById("nextBtn");
         if (currentCardIndex === flashcards.length - 1) {
-            nextBtn.textContent = 'Start Quiz 🧠';
-            nextBtn.onclick = startQuiz;
+          nextBtn.textContent = "Start Quiz 🧠";
+          nextBtn.onclick = startQuiz;
         } else {
-            nextBtn.textContent = 'Selanjutnya →';
-            nextBtn.onclick = nextCard;
+          nextBtn.textContent = "Selanjutnya →";
+          nextBtn.onclick = nextCard;
         }
-    }
+      }
 
-    function flipCard() {
-        document.getElementById('flashcard').classList.toggle('flipped');
-    }
+      function flipCard() {
+        document.getElementById("flashcard").classList.toggle("flipped");
+      }
 
-    function previousCard() {
+      function previousCard() {
         if (currentCardIndex > 0) {
-            currentCardIndex--;
-            updateFlashcard();
+          currentCardIndex--;
+          updateFlashcard();
         }
-    }
+      }
 
-    function nextCard() {
+      function nextCard() {
         if (currentCardIndex < flashcards.length - 1) {
-            currentCardIndex++;
-            updateFlashcard();
+          currentCardIndex++;
+          updateFlashcard();
         }
-    }
+      }
 
-    // Quiz functions
-    async function startQuiz() {
+      // Quiz functions
+      async function startQuiz() {
         showLoading();
         try {
-            const response = await fetch('/api/quiz', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    type: currentType,
-                    level: currentLevel,
-                    flashcards: flashcards
-                }),
-                  credentials: 'include' 
-            });
-            const data = await response.json();
-            if (data.success) {
-                quiz = data.quiz;
-                currentQuestionIndex = 0;
-                quizScore = 0;
-                selectedAnswer = null;
-                showQuizScreen();
-                updateQuizQuestion();
-            } else {
-                alert('Failed to load quiz: ' + data.error);
-            }
+          const response = await fetch("/api/quiz", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              type: currentType,
+              level: currentLevel,
+              flashcards: flashcards,
+            }),
+            credentials: "include",
+          });
+          const data = await response.json();
+          if (data.success) {
+            quiz = data.quiz;
+            currentQuestionIndex = 0;
+            quizScore = 0;
+            selectedAnswer = null;
+            showQuizScreen();
+            updateQuizQuestion();
+          } else {
+            alert("Failed to load quiz: " + data.error);
+          }
         } catch (error) {
-            console.error('Error starting quiz:', error);
-            alert('Error loading quiz');
+          console.error("Error starting quiz:", error);
+          alert("Error loading quiz");
         } finally {
-            hideLoading();
+          hideLoading();
         }
-    }
+      }
 
-    function showQuizScreen() {
-        document.getElementById('flashcardsScreen').classList.add('hidden');
-        document.getElementById('quizScreen').classList.remove('hidden');
-    }
+      function showQuizScreen() {
+        document.getElementById("flashcardsScreen").classList.add("hidden");
+        document.getElementById("quizScreen").classList.remove("hidden");
+      }
 
-    function updateQuizQuestion() {
+      function updateQuizQuestion() {
         if (!quiz || !quiz.questions) return;
         const question = quiz.questions[currentQuestionIndex];
-        
-        document.getElementById('questionText').textContent = question.question;
-        document.getElementById('questionCharacter').textContent = question.character || '';
-        
-        document.getElementById('quizProgressText').textContent = `Soal ${currentQuestionIndex + 1} dari ${quiz.questions.length}`;
-        document.getElementById('quizScore').textContent = `Skor: ${quizScore}`;
-        document.getElementById('quizProgressBar').style.width = `${((currentQuestionIndex + 1) / quiz.questions.length) * 100}%`;
-        
-        const optionsContainer = document.getElementById('optionsContainer');
-        optionsContainer.innerHTML = '';
-        
-        question.options.forEach((option, index) => {
-            const button = document.createElement('button');
-            button.className = 'option-btn bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200 border-2 border-transparent';
-            button.textContent = option;
-            button.onclick = () => selectAnswer(index, button);
-            optionsContainer.appendChild(button);
-        });
-        
-        selectedAnswer = null;
-        document.getElementById('nextQuestionBtn').classList.add('hidden');
-    }
 
-    function selectAnswer(answerIndex, buttonElement) {
-        if (selectedAnswer !== null) return; 
-        
+        document.getElementById("questionText").textContent = question.question;
+        document.getElementById("questionCharacter").textContent = question.character || "";
+
+        document.getElementById("quizProgressText").textContent = `Soal ${currentQuestionIndex + 1} dari ${quiz.questions.length}`;
+        document.getElementById("quizScore").textContent = `Skor: ${quizScore}`;
+        document.getElementById("quizProgressBar").style.width = `${((currentQuestionIndex + 1) / quiz.questions.length) * 100}%`;
+
+        const optionsContainer = document.getElementById("optionsContainer");
+        optionsContainer.innerHTML = "";
+
+        question.options.forEach((option, index) => {
+          const button = document.createElement("button");
+          button.className = "option-btn bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200 border-2 border-transparent";
+          button.textContent = option;
+          button.onclick = () => selectAnswer(index, button);
+          optionsContainer.appendChild(button);
+        });
+
+        selectedAnswer = null;
+        document.getElementById("nextQuestionBtn").classList.add("hidden");
+      }
+
+      function selectAnswer(answerIndex, buttonElement) {
+        if (selectedAnswer !== null) return;
+
         selectedAnswer = answerIndex;
         const question = quiz.questions[currentQuestionIndex];
         const isCorrect = answerIndex === question.correctAnswer;
-        
-        const allButtons = document.querySelectorAll('.option-btn');
+
+        const allButtons = document.querySelectorAll(".option-btn");
         allButtons.forEach((btn, index) => {
-            btn.disabled = true;
-            if (index === question.correctAnswer) {
-                btn.classList.remove('bg-gray-700', 'hover:bg-gray-600');
-                btn.classList.add('border-green-500', 'bg-green-600');
-            } else if (index === answerIndex && !isCorrect) {
-                btn.classList.remove('bg-gray-700', 'hover:bg-gray-600');
-                btn.classList.add('border-red-500', 'bg-red-600');
-            }
+          btn.disabled = true;
+          if (index === question.correctAnswer) {
+            btn.classList.remove("bg-gray-700", "hover:bg-gray-600");
+            btn.classList.add("border-green-500", "bg-green-600");
+          } else if (index === answerIndex && !isCorrect) {
+            btn.classList.remove("bg-gray-700", "hover:bg-gray-600");
+            btn.classList.add("border-red-500", "bg-red-600");
+          }
         });
-        
+
         if (isCorrect) {
-            quizScore++;
+          quizScore++;
         }
-        
-        const nextBtn = document.getElementById('nextQuestionBtn');
+
+        const nextBtn = document.getElementById("nextQuestionBtn");
         if (currentQuestionIndex === quiz.questions.length - 1) {
-            nextBtn.textContent = 'Lihat Hasil';
-            nextBtn.onclick = showQuizResult;
+          nextBtn.textContent = "Lihat Hasil";
+          nextBtn.onclick = showQuizResult;
         } else {
-            nextBtn.textContent = 'Soal Selanjutnya';
-            nextBtn.onclick = nextQuestion;
+          nextBtn.textContent = "Soal Selanjutnya";
+          nextBtn.onclick = nextQuestion;
         }
-        nextBtn.classList.remove('hidden');
-    }
+        nextBtn.classList.remove("hidden");
+      }
 
-    function nextQuestion() {
+      function nextQuestion() {
         if (currentQuestionIndex < quiz.questions.length - 1) {
-            currentQuestionIndex++;
-            updateQuizQuestion();
+          currentQuestionIndex++;
+          updateQuizQuestion();
         }
-    }
+      }
 
-    async function showQuizResult() {
+      async function showQuizResult() {
         showLoading();
         const percentage = Math.round((quizScore / quiz.questions.length) * 100);
         let resultData = null;
 
         try {
-            const response = await fetch('/api/quiz/result', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    type: currentType,
-                    level: currentLevel,
-                    score: quizScore,
-                    totalQuestions: quiz.questions.length
-                }),
-                  credentials: 'include' 
-            });
-            resultData = await response.json();
-            if (!resultData.success) {
-                console.error('Failed to save quiz result:', resultData.error);
-            }
+          const response = await fetch("/api/quiz/result", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              type: currentType,
+              level: currentLevel,
+              score: quizScore,
+              totalQuestions: quiz.questions.length,
+            }),
+            credentials: "include",
+          });
+          resultData = await response.json();
+          if (!resultData.success) {
+            console.error("Failed to save quiz result:", resultData.error);
+          }
         } catch (error) {
-            console.error('Error saving quiz result:', error);
-            alert('Could not save your quiz result. Please check your connection.');
+          console.error("Error saving quiz result:", error);
+          alert("Could not save your quiz result. Please check your connection.");
         } finally {
-            hideLoading();
+          hideLoading();
         }
-        
-        const modal = document.getElementById('quizModal');
-        const emoji = document.getElementById('resultEmoji');
-        const title = document.getElementById('resultTitle');
-        const message = document.getElementById('resultMessage');
-        const percentageEl = document.getElementById('resultPercentage');
-        
+
+        const modal = document.getElementById("quizModal");
+        const emoji = document.getElementById("resultEmoji");
+        const title = document.getElementById("resultTitle");
+        const message = document.getElementById("resultMessage");
+        const percentageEl = document.getElementById("resultPercentage");
+
         if (percentage >= 80) {
-            emoji.textContent = '🎉';
-            title.textContent = 'Luar Biasa!';
+          emoji.textContent = "🎉";
+          title.textContent = "Luar Biasa!";
         } else if (percentage >= 70) {
-            emoji.textContent = '👍';
-            title.textContent = 'Kerja Bagus!';
+          emoji.textContent = "👍";
+          title.textContent = "Kerja Bagus!";
         } else {
-            emoji.textContent = '💪';
-            title.textContent = 'Terus Berlatih!';
+          emoji.textContent = "💪";
+          title.textContent = "Terus Berlatih!";
         }
-        
+
         message.textContent = `Anda menjawab ${quizScore} dari ${quiz.questions.length} soal dengan benar!`;
         percentageEl.textContent = `${percentage}%`;
-        
-        const continueBtn = document.getElementById('continueBtn');
+
+        const continueBtn = document.getElementById("continueBtn");
         if (resultData && resultData.success) {
-            continueBtn.onclick = () => continueStudy(resultData.newLevel);
+          continueBtn.onclick = () => continueStudy(resultData.newLevel);
         } else {
-            continueBtn.onclick = () => continueStudy(currentLevel);
+          continueBtn.onclick = () => continueStudy(currentLevel);
         }
-        
-        modal.classList.remove('hidden');
+
+        modal.classList.remove("hidden");
         setTimeout(() => {
-            document.getElementById('modalContent').classList.remove('scale-95');
-            document.getElementById('modalContent').classList.add('scale-100');
+          document.getElementById("modalContent").classList.remove("scale-95");
+          document.getElementById("modalContent").classList.add("scale-100");
         }, 100);
-    }
+      }
 
-
-    function backToWelcome() {
+      function backToWelcome() {
         closeModal();
-        document.getElementById('quizScreen').classList.add('hidden');
-        document.getElementById('flashcardsScreen').classList.add('hidden');
-        document.getElementById('welcomeScreen').classList.remove('hidden');
+        document.getElementById("quizScreen").classList.add("hidden");
+        document.getElementById("flashcardsScreen").classList.add("hidden");
+        document.getElementById("welcomeScreen").classList.remove("hidden");
         loadProgress();
-    }
+      }
 
-    function closeModal() {
-        const modalContent = document.getElementById('modalContent');
-        modalContent.classList.remove('scale-100');
-        modalContent.classList.add('scale-95');
+      function closeModal() {
+        const modalContent = document.getElementById("modalContent");
+        modalContent.classList.remove("scale-100");
+        modalContent.classList.add("scale-95");
         setTimeout(() => {
-            document.getElementById('quizModal').classList.add('hidden');
+          document.getElementById("quizModal").classList.add("hidden");
         }, 200);
-    }
+      }
     </script>
-</body>
+  </body>
 </html>
